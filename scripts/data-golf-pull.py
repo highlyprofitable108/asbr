@@ -1,61 +1,61 @@
 import os
 import requests
-from time import sleep
 import pandas as pd
-from io import StringIO
 
-# Use the secret from the environment variable
-api_key = os.getenv('API_KEY')
+# API key
+api_key = os.environ['API_KEY']
+
+# Base URL
 base_url = "https://feeds.datagolf.com"
 
+# Define the path for CSV files
+csv_file_path = '/Users/michaelfuscoletti/Desktop/data'
+
+# Check if the directory exists, if not, create it
+if not os.path.exists(csv_file_path):
+    os.makedirs(csv_file_path)
+
+# Your tour list
 tours = ['pga', 'euro', 'kft', 'alt']
-years = range(2017, 2023)
+
+# Your event ids list
+event_ids = list(range(1, 101))  # Replace with your actual event ids
+
+# Your years list
+years = list(range(2017, 2024))
+
+# Your market
 market = 'win'
+
+# Your book list
 books = ['betmgm', 'draftkings', 'Fanduel']
+
+# Your odds format
 odds_format = 'american'
+
+# Your file format
 file_format = 'csv'
 
-# Get event IDs
-def get_event_ids(tour):
-    endpoint = f"{base_url}/historical-odds/event-list?tour={tour}&file_format={file_format}&key={api_key}"
-    response = requests.get(endpoint)
-    if response.status_code == 200:
-        data = StringIO(response.text)
-        df = pd.read_csv(data)
-        return df['event_id'].unique()
-    else:
-        return []
+# Loop through all tours, events and years
+for tour in tours:
+    for event_id in event_ids:
+        for year in years:
+            for book in books:
+                # Print debugging information
+                print(f"Fetching data for tour: {tour}, event_id: {event_id}, year: {year}, book: {book}")
 
-def fetch_data():
-    with open('event_ids.csv', 'w') as event_ids_file, open('odds_data.csv', 'w') as odds_data_file, open('raw_data.csv', 'w') as raw_data_file:
-        for tour in tours:
-            events = get_event_ids(tour)
-            event_ids_file.write(f"{tour},{','.join(map(str, events))}\n")
+                # Call API
+                outrights = get_historical_outrights(tour, event_id, year, market, book, odds_format, file_format)
+                matchups = get_historical_matchups(tour, event_id, year, book, odds_format, file_format)
 
-            for event in events:
-                for year in years:
-                    for book in books:
-                        sleep(1)  # To avoid overloading the server
+                # Convert to DataFrame
+                df_outrights = pd.DataFrame(outrights)
+                df_matchups = pd.DataFrame(matchups)
 
-                        # Get Outrights Data
-                        endpoint = f"{base_url}/historical-odds/outrights?tour={tour}&event_id={event}&year={year}&market={market}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
-                        response = requests.get(endpoint)
-                        if response.status_code == 200:
-                            data = response.text
-                            odds_data_file.write(f"{tour},{event},{year},{book},outright,{data}\n")
+                # Save to CSV
+                df_outrights.to_csv(f'{csv_file_path}/historical_outrights_{tour}_{event_id}_{year}_{book}.csv', index=False)
+                df_matchups.to_csv(f'{csv_file_path}/historical_matchups_{tour}_{event_id}_{year}_{book}.csv', index=False)
 
-                        # Get Matchups Data
-                        endpoint = f"{base_url}/historical-odds/matchups?tour={tour}&event_id={event}&year={year}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
-                        response = requests.get(endpoint)
-                        if response.status_code == 200:
-                            data = response.text
-                            odds_data_file.write(f"{tour},{event},{year},{book},matchup,{data}\n")
-
-                        # Get Rounds Data
-                        endpoint = f"{base_url}/historical-raw-data/rounds?tour={tour}&event_id={event}&year={year}&file_format={file_format}&key={api_key}"
-                        response = requests.get(endpoint)
-                        if response.status_code == 200:
-                            data = response.text
-                            raw_data_file.write(f"{tour},{event},{year},{book},{data}\n")
-
-fetch_data()
+                # Print some data for debugging
+                print(df_outrights.head())
+                print(df_matchups.head())
