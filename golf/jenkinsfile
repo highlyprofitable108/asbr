@@ -6,9 +6,14 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('Setup') {
             steps {
                 checkout scm // This automatically checks out the Git repository where the Jenkinsfile is located
+                script {
+                    sh 'python3 -m venv env'
+                    sh 'source env/bin/activate'
+                    sh 'pip install -r /golf/scripts/requirements.txt'
+                }
             }
         }
 
@@ -17,7 +22,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'datagolf-token', variable: 'API_KEY')]) {
                     sh '''
                     echo "Executing Python script..."
-                    /usr/local/bin/python3 golf/scripts/data-golf-pull.py
+                    /usr/local/bin/python3 /golf/scripts/data-golf-pull.py
                     '''
                 }
             }
