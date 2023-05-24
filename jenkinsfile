@@ -27,7 +27,8 @@ pipeline {
                     sh '''
                         echo "Executing Python script..."
                         source env/bin/activate
-                        python scripts/data-golf-pull.py
+                        python scripts/data-golf-pull.py > output.log 2>&1
+                        cat output.log
                     '''
                 }
             }
@@ -43,3 +44,4 @@ pipeline {
         }
     }
 }
+
