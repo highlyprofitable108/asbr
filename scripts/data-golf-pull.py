@@ -46,15 +46,11 @@ def get_data_from_api(endpoint):
     try:
         response = requests.get(endpoint)
         response.raise_for_status()
-        print("Status Code:", response.status_code)
-        print("Response Text:", response.text)
-        return response.json()
+        return response.text
     except requests.exceptions.HTTPError as err:
         handle_error(f"HTTP error occurred: {err}")
     except requests.exceptions.RequestException as err:
         handle_error(f"An exception occurred: {err}")
-    except ValueError as err:
-        handle_error(f"Error parsing JSON: {err}")
     return None
 
 
@@ -99,23 +95,32 @@ for tour in tours:
             matchups = get_historical_matchups(tour, event_id, year, book, odds_format, file_format)
 
             # Check if data retrieval was successful
-            if raw_data is None or outrights is None or matchups is None:
+            if raw_data is None:
                 # Skip this iteration if data retrieval failed
                 continue
 
-            # Convert to DataFrames
-            df_raw_data = pd.DataFrame(raw_data)
-            df_outrights = pd.DataFrame(outrights)
-            df_matchups = pd.DataFrame(matchups)
+            # Save raw data to CSV
+            file_name = f'raw_data_{tour}_{year}_{book}.csv'
+            file_path = os.path.join(csv_file_path, file_name)
+            with open(file_path, 'w') as file:
+                file.write(raw_data)
 
-            # Concatenate DataFrames
-            df_temp = pd.concat([df_raw_data, df_outrights, df_matchups], axis=0)
-            df_total = pd.concat([df_total, df_temp], axis=0)
+            # Print some data for debugging
+            print(raw_data[:100])  # Print a portion of the raw data
 
-        # Save to CSV
-        file_name = f'historical_data_{tour}_{year}.csv'
-        file_path = os.path.join(csv_file_path, file_name)
-        df_total.to_csv(file_path, index=False)
+            # # Convert to DataFrames
+            # df_raw_data = pd.read_csv(file_path)
+            # df_outrights = pd.DataFrame(outrights)
+            # df_matchups = pd.DataFrame(matchups)
+
+            # # Concatenate DataFrames
+            # df_temp = pd.concat([df_raw_data, df_outrights, df_matchups], axis=0)
+            # df_total = pd.concat([df_total, df_temp], axis=0)
+
+        # # Save to CSV
+        # file_name = f'historical_data_{tour}_{year}.csv'
+        # file_path = os.path.join(csv_file_path, file_name)
+        # df_total.to_csv(file_path, index=False)
 
         # Print some data for debugging
-        print(df_total.head())
+        # print(df_total.head())
