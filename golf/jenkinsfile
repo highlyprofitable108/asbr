@@ -17,7 +17,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'datagolf-token', variable: 'API_KEY')]) {
                     sh '''
                     echo "Executing Python script..."
-                    /usr/local/bin/python3 scripts/data-golf-pull.py
+                    /usr/local/bin/python3 golf/scripts/data-golf-pull.py
                     '''
                 }
             }
