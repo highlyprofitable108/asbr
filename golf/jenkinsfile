@@ -1,1 +1,35 @@
+pipeline {
+    agent any
 
+    environment {
+        PATH = "$PATH:/usr/local/bin"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm // This automatically checks out the Git repository where the Jenkinsfile is located
+            }
+        }
+
+        stage('Execute Python Script') {
+            steps {
+                withCredentials([string(credentialsId: 'datagolf-token', variable: 'API_KEY')]) {
+                    sh '''
+                    echo "Executing Python script..."
+                    /usr/local/bin/python3 scripts/data-golf-pull.py
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'This will always run'
+        }
+        success {
+            echo 'This will run only if successful'
+        }
+    }
+}
