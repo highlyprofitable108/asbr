@@ -15,7 +15,7 @@ pipeline {
                         source env/bin/activate
                         python3 -m ensurepip --upgrade
                         pip3 install --upgrade pip
-                        pip3 install -r /golf/scripts/requirements.txt
+                        pip3 install -r /asbr/golf/scripts/requirements.txt
                     '''    
                 }
             }
@@ -26,7 +26,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'datagolf-token', variable: 'API_KEY')]) {
                     sh '''
                     echo "Executing Python script..."
-                    /usr/local/bin/python3 /golf/scripts/data-golf-pull.py
+                    /usr/local/bin/python3 /asbr/golf/scripts/data-golf-pull.py
                     '''
                 }
             }
