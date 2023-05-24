@@ -16,16 +16,19 @@ if not os.path.exists(csv_file_path):
     os.makedirs(csv_file_path)
 
 # Your tour list
-tours = ['pga', 'euro', 'kft', 'alt']
+tours = ['pga']
+# , 'euro', 'kft', 'alt'
 
 # Your years list
-years = list(range(2017, 2023))
+years = list(range(2022, 2023))
+# 2022
 
 # Your market
 market = 'win'
 
 # Your book list
-books = ['betmgm', 'draftkings', 'Fanduel']
+books = ['betmgm']
+# , 'draftkings', 'Fanduel'
 
 # Your odds format
 odds_format = 'american'
