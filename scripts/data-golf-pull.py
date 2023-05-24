@@ -46,6 +46,8 @@ def get_data_from_api(endpoint):
     try:
         response = requests.get(endpoint)
         response.raise_for_status()
+        print("Status Code:", response.status_code)
+        print("Response Text:", response.text)
         return response.json()
     except requests.exceptions.HTTPError as err:
         handle_error(f"HTTP error occurred: {err}")
@@ -100,11 +102,6 @@ for tour in tours:
             if raw_data is None or outrights is None or matchups is None:
                 # Skip this iteration if data retrieval failed
                 continue
-
-            # Print the JSON response content
-            print(f"Raw Data: {raw_data}")
-            print(f"Outrights: {outrights}")
-            print(f"Matchups: {matchups}")
 
             # Convert to DataFrames
             df_raw_data = pd.DataFrame(raw_data)
