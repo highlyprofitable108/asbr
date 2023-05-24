@@ -2,6 +2,7 @@ import os
 import requests
 import pandas as pd
 from datetime import datetime
+import time
 
 # API key
 api_key = os.environ['API_KEY']
@@ -37,6 +38,12 @@ odds_format = 'american'
 # Set event_id as 'all'
 event_id = 'all'
 
+# Rate limiting parameters
+request_delay = 1  # Delay between API requests in seconds
+max_requests_per_minute = 50  # Maximum number of API requests per minute
+
+# Counter for tracking requests
+requests_counter = 0
 
 def handle_error(error_message):
     print(f"An error occurred: {error_message}")
@@ -44,11 +51,21 @@ def handle_error(error_message):
 
 
 def get_data_from_api(endpoint):
+    global requests_counter
     try:
+        # Check rate limiting
+        if requests_counter >= max_requests_per_minute:
+            # Delay if the maximum number of requests has been reached
+            print(f"Reached maximum requests per minute. Waiting for {request_delay} seconds...")
+            time.sleep(request_delay)
+            requests_counter = 0
+
         response = requests.get(endpoint)
         response.raise_for_status()
-        print("Status Code:", response.status_code)
-        print("Response Text:", response.text)
+
+        # Update requests counter
+        requests_counter += 1
+
         return response.json()
     except requests.exceptions.HTTPError as err:
         handle_error(f"HTTP error occurred: {err}")
