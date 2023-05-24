@@ -25,6 +25,9 @@ years = list(range(2017, 2023))
 # Your market
 market = 'win'
 
+# File format
+file_format = 'csv'
+
 # Your book list
 books = ['betmgm', 'draftkings', 'Fanduel']
 
