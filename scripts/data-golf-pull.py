@@ -49,6 +49,14 @@ def handle_error(error_message):
     print(f"An error occurred: {error_message}")
     # Additional error handling logic or notifications can be added here
 
+def sanitize_csv_data(data):
+    # Remove the first line
+    data = data[data.index != 0]
+
+    # Remove leading and trailing double quotes
+    data = data.applymap(lambda x: x.strip('"'))
+
+    return data
 
 def get_data_from_api(endpoint):
     global requests_counter
@@ -62,11 +70,13 @@ def get_data_from_api(endpoint):
 
         response = requests.get(endpoint)
         response.raise_for_status()
+        print("Status Code:", response.status_code)
+        print("Response Text:", response.text)
 
         # Update requests counter
         requests_counter += 1
 
-        return response.json()
+        return response.text
     except requests.exceptions.HTTPError as err:
         handle_error(f"HTTP error occurred: {err}")
     except requests.exceptions.RequestException as err:
@@ -75,30 +85,25 @@ def get_data_from_api(endpoint):
         handle_error(f"Error parsing JSON: {err}")
     return None
 
-
 def get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format):
     endpoint = f"{base_url}/historical-raw-data/rounds?tour={tour}&event_id={event_id}&year={year}&file_format={file_format}&key={api_key}"
     return get_data_from_api(endpoint)
-
 
 def get_historical_outrights(tour, event_id, year, market, book, odds_format, file_format):
     endpoint = f"{base_url}/historical-odds/outrights?tour={tour}&event_id={event_id}&year={year}&market={market}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
     return get_data_from_api(endpoint)
 
-
 def get_historical_matchups(tour, event_id, year, book, odds_format, file_format):
     endpoint = f"{base_url}/historical-odds/matchups?tour={tour}&event_id={event_id}&year={year}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
     return get_data_from_api(endpoint)
 
-
 # Loop through all tours and years
 for tour in tours:
     for year in years:
-        # Optionally, you can also parse the data as DataFrames if needed
         # Initialize empty DataFrames
-        # df_raw_data = pd.DataFrame()
-        # df_outrights = pd.DataFrame()
-        # df_matchups = pd.DataFrame()
+        df_raw_data = pd.DataFrame()
+        df_outrights = pd.DataFrame()
+        df_matchups = pd.DataFrame()
 
         for book in books:
             # Print debugging information
@@ -114,29 +119,29 @@ for tour in tours:
                 # Skip this iteration if data retrieval failed
                 continue
 
-            # Optionally, you can also parse the data as DataFrames if needed
-            # df_raw_data = pd.DataFrame(raw_data)
-            # df_outrights = pd.DataFrame(outrights)
-            # df_matchups = pd.DataFrame(matchups)
-
             # Save raw data to CSV with timestamp in file name
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             raw_data_file_name = f'raw_data_{timestamp}.csv'
             raw_data_file_path = os.path.join(csv_file_path, raw_data_file_name)
             with open(raw_data_file_path, 'w') as file:
-                file.write(str(raw_data))
+                file.write(raw_data)
 
             # Save outrights data to CSV with timestamp in file name
             outrights_file_name = f'outrights_{timestamp}.csv'
             outrights_file_path = os.path.join(csv_file_path, outrights_file_name)
             with open(outrights_file_path, 'w') as file:
-                file.write(str(outrights))
+                file.write(outrights)
 
             # Save matchups data to CSV with timestamp in file name
             matchups_file_name = f'matchups_{timestamp}.csv'
             matchups_file_path = os.path.join(csv_file_path, matchups_file_name)
             with open(matchups_file_path, 'w') as file:
-                file.write(str(matchups))
+                file.write(matchups)
+
+            # Sanitize the CSV data
+            df_raw_data = sanitize_csv_data(pd.read_csv(raw_data_file_path))
+            df_outrights = sanitize_csv_data(pd.read_csv(outrights_file_path))
+            df_matchups = sanitize_csv_data(pd.read_csv(matchups_file_path))
 
         # You can further process the DataFrames if needed
         # Concatenate or merge the DataFrames, perform additional operations, etc.
