@@ -1,9 +1,11 @@
+import os
 import requests
 from time import sleep
 import pandas as pd
 from io import StringIO
 
-api_key = "195c3cb68dd9f46d7feaafc4829c"
+# Use the secret from the environment variable
+api_key = os.getenv('API_KEY')
 base_url = "https://feeds.datagolf.com"
 
 tours = ['pga', 'euro', 'kft', 'alt']
