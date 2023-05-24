@@ -56,9 +56,9 @@ def get_data_from_api(endpoint):
     return None
 
 
-# def get_historical_raw_data_event_ids(file_format='json'):
-  #   endpoint = f"{base_url}/historical-raw-data/event-list?file_format={file_format}&key={api_key}"
-  #   return get_data_from_api(endpoint)
+def get_historical_raw_data_event_ids(file_format='json'):
+    endpoint = f"{base_url}/historical-raw-data/event-list?file_format={file_format}&key={api_key}"
+    return get_data_from_api(endpoint)
 
 
 def get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format='json'):
@@ -66,18 +66,19 @@ def get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format='js
     return get_data_from_api(endpoint)
 
 
-# def get_historical_odds_data_event_ids(tour='pga', file_format='json'):
-  #   endpoint = f"{base_url}/historical-odds/event-list?tour={tour}&file_format={file_format}&key={api_key}"
-  #   return get_data_from_api(endpoint)
-
-# def get_historical_outrights(tour, event_id, year, market, book, odds_format='decimal', file_format='json'):
-  #   endpoint = f"{base_url}/historical-odds/outrights?tour={tour}&event_id={event_id}&year={year}&market={market}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
-  #   return get_data_from_api(endpoint)
+def get_historical_odds_data_event_ids(tour='pga', file_format='json'):
+    endpoint = f"{base_url}/historical-odds/event-list?tour={tour}&file_format={file_format}&key={api_key}"
+    return get_data_from_api(endpoint)
 
 
-# def get_historical_matchups(tour, event_id, year, book, odds_format='decimal', file_format='json'):
-  #   endpoint = f"{base_url}/historical-odds/matchups?tour={tour}&event_id={event_id}&year={year}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
-  #   return get_data_from_api(endpoint)
+def get_historical_outrights(tour, event_id, year, market, book, odds_format='decimal', file_format='json'):
+    endpoint = f"{base_url}/historical-odds/outrights?tour={tour}&event_id={event_id}&year={year}&market={market}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
+    return get_data_from_api(endpoint)
+
+
+def get_historical_matchups(tour, event_id, year, book, odds_format='decimal', file_format='json'):
+    endpoint = f"{base_url}/historical-odds/matchups?tour={tour}&event_id={event_id}&year={year}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
+    return get_data_from_api(endpoint)
 
 
 # Loop through all tours and years
@@ -92,21 +93,23 @@ for tour in tours:
 
             # Call API and retrieve data
             raw_data = get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format)
-            # outrights = get_historical_outrights(tour, event_id, year, market, book, odds_format, file_format)
-            # matchups = get_historical_matchups(tour, event_id, year, book, odds_format, file_format)
+            outrights = get_historical_outrights(tour, event_id, year, market, book, odds_format, file_format)
+            matchups = get_historical_matchups(tour, event_id, year, book, odds_format, file_format)
 
             # Check if data retrieval was successful
             if raw_data is None or outrights is None or matchups is None:
                 # Skip this iteration if data retrieval failed
                 continue
-                
-            # Print the response
-            print(raw_data)
+
+            # Print the JSON response content
+            print(f"Raw Data: {raw_data}")
+            print(f"Outrights: {outrights}")
+            print(f"Matchups: {matchups}")
 
             # Convert to DataFrames
             df_raw_data = pd.DataFrame(raw_data)
-            # df_outrights = pd.DataFrame(outrights)
-            # df_matchups = pd.DataFrame(matchups)
+            df_outrights = pd.DataFrame(outrights)
+            df_matchups = pd.DataFrame(matchups)
 
             # Concatenate DataFrames
             df_temp = pd.concat([df_raw_data, df_outrights, df_matchups], axis=0)
