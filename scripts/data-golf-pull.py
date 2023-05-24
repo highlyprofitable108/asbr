@@ -18,11 +18,8 @@ if not os.path.exists(csv_file_path):
 # Your tour list
 tours = ['pga', 'euro', 'kft', 'alt']
 
-# Your event ids list
-event_ids = list(range(1, 101))  # Replace with your actual event ids
-
 # Your years list
-years = list(range(2017, 2024))
+years = list(range(2017, 2023))
 
 # Your market
 market = 'win'
@@ -36,26 +33,65 @@ odds_format = 'american'
 # Your file format
 file_format = 'csv'
 
-# Loop through all tours, events and years
+# Set event_id as 'all'
+event_id = 'all'
+
+# 1. Historical Raw Data Event IDs
+def get_historical_raw_data_event_ids(file_format='json'):
+    endpoint = f"{base_url}/historical-raw-data/event-list?file_format={file_format}&key={api_key}"
+    response = requests.get(endpoint)
+    return response.json()
+
+# 2. Round Scoring, Stats & Strokes Gained
+def get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format='json'):
+    endpoint = f"{base_url}/historical-raw-data/rounds?tour={tour}&event_id={event_id}&year={year}&file_format={file_format}&key={api_key}"
+    response = requests.get(endpoint)
+    return response.json()
+
+# 3. Historical Odds Data Event IDs
+def get_historical_odds_data_event_ids(tour='pga', file_format='json'):
+    endpoint = f"{base_url}/historical-odds/event-list?tour={tour}&file_format={file_format}&key={api_key}"
+    response = requests.get(endpoint)
+    return response.json()
+
+# 4. Historical Outrights
+def get_historical_outrights(tour, event_id, year, market, book, odds_format='decimal', file_format='json'):
+    endpoint = f"{base_url}/historical-odds/outrights?tour={tour}&event_id={event_id}&year={year}&market={market}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
+    response = requests.get(endpoint)
+    return response.json()
+
+# 5. Historical Match-Ups & 3-Balls
+def get_historical_matchups(tour, event_id, year, book, odds_format='decimal', file_format='json'):
+    endpoint = f"{base_url}/historical-odds/matchups?tour={tour}&event_id={event_id}&year={year}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
+    response = requests.get(endpoint)
+    return response.json()
+
+# Loop through all tours and years
 for tour in tours:
-    for event_id in event_ids:
-        for year in years:
-            for book in books:
-                # Print debugging information
-                print(f"Fetching data for tour: {tour}, event_id: {event_id}, year: {year}, book: {book}")
+    for year in years:
+        # Initialize empty DataFrame
+        df_total = pd.DataFrame()
 
-                # Call API
-                outrights = get_historical_outrights(tour, event_id, year, market, book, odds_format, file_format)
-                matchups = get_historical_matchups(tour, event_id, year, book, odds_format, file_format)
+        for book in books:
+            # Print debugging information
+            print(f"Fetching data for tour: {tour}, event_id: {event_id}, year: {year}, book: {book}")
 
-                # Convert to DataFrame
-                df_outrights = pd.DataFrame(outrights)
-                df_matchups = pd.DataFrame(matchups)
+            # Call API
+            raw_data = get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format)
+            outrights = get_historical_outrights(tour, event_id, year, market, book, odds_format, file_format)
+            matchups = get_historical_matchups(tour, event_id, year, book, odds_format, file_format)
 
-                # Save to CSV
-                df_outrights.to_csv(f'{csv_file_path}/historical_outrights_{tour}_{event_id}_{year}_{book}.csv', index=False)
-                df_matchups.to_csv(f'{csv_file_path}/historical_matchups_{tour}_{event_id}_{year}_{book}.csv', index=False)
+            # Convert to DataFrame
+            df_raw_data = pd.DataFrame(raw_data)
+            df_outrights = pd.DataFrame(outrights)
+            df_matchups = pd.DataFrame(matchups)
 
-                # Print some data for debugging
-                print(df_outrights.head())
-                print(df_matchups.head())
+            # Concatenate DataFrames
+            df_temp = pd.concat([df_raw_data, df_outrights, df_matchups], axis=0)
+            df_total = pd.concat([df_total, df_temp], axis=0)
+
+        # Save to CSV
+        df_total.to_csv(f'{csv_file_path}/historical_data_{tour}_{year}.csv', index=False)
+
+        # Print some data for debugging
+        print(df_total.head())
