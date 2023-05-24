@@ -39,6 +39,8 @@ event_id = 'all'
 def get_historical_raw_data_event_ids(file_format='json'):
     endpoint = f"{base_url}/historical-raw-data/event-list?file_format={file_format}&key={api_key}"
     response = requests.get(endpoint)
+    print("Status Code:", response.status_code)
+    print("Response Text:", response.text)
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
@@ -49,6 +51,8 @@ def get_historical_raw_data_event_ids(file_format='json'):
 def get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format='json'):
     endpoint = f"{base_url}/historical-raw-data/rounds?tour={tour}&event_id={event_id}&year={year}&file_format={file_format}&key={api_key}"
     response = requests.get(endpoint)
+    print("Status Code:", response.status_code)
+    print("Response Text:", response.text)
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
@@ -59,6 +63,8 @@ def get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format='js
 def get_historical_odds_data_event_ids(tour='pga', file_format='json'):
     endpoint = f"{base_url}/historical-odds/event-list?tour={tour}&file_format={file_format}&key={api_key}"
     response = requests.get(endpoint)
+    print("Status Code:", response.status_code)
+    print("Response Text:", response.text)
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
@@ -69,6 +75,8 @@ def get_historical_odds_data_event_ids(tour='pga', file_format='json'):
 def get_historical_outrights(tour, event_id, year, market, book, odds_format='decimal', file_format='json'):
     endpoint = f"{base_url}/historical-odds/outrights?tour={tour}&event_id={event_id}&year={year}&market={market}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
     response = requests.get(endpoint)
+    print("Status Code:", response.status_code)
+    print("Response Text:", response.text)
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
@@ -79,6 +87,8 @@ def get_historical_outrights(tour, event_id, year, market, book, odds_format='de
 def get_historical_matchups(tour, event_id, year, book, odds_format='decimal', file_format='json'):
     endpoint = f"{base_url}/historical-odds/matchups?tour={tour}&event_id={event_id}&year={year}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
     response = requests.get(endpoint)
+    print("Status Code:", response.status_code)
+    print("Response Text:", response.text)
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
