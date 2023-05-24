@@ -49,6 +49,14 @@ def handle_error(error_message):
     print(f"An error occurred: {error_message}")
     # Additional error handling logic or notifications can be added here
 
+def sanitize_csv_data(data):
+    # Remove the first line
+    data = data[data.index != 0]
+
+    # Remove leading and trailing double quotes
+    data = data.applymap(lambda x: x.strip('"'))
+
+    return data
 
 def get_data_from_api(endpoint):
     global requests_counter
@@ -77,21 +85,17 @@ def get_data_from_api(endpoint):
         handle_error(f"Error parsing JSON: {err}")
     return None
 
-
 def get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format):
     endpoint = f"{base_url}/historical-raw-data/rounds?tour={tour}&event_id={event_id}&year={year}&file_format={file_format}&key={api_key}"
     return get_data_from_api(endpoint)
-
 
 def get_historical_outrights(tour, event_id, year, market, book, odds_format, file_format):
     endpoint = f"{base_url}/historical-odds/outrights?tour={tour}&event_id={event_id}&year={year}&market={market}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
     return get_data_from_api(endpoint)
 
-
 def get_historical_matchups(tour, event_id, year, book, odds_format, file_format):
     endpoint = f"{base_url}/historical-odds/matchups?tour={tour}&event_id={event_id}&year={year}&book={book}&odds_format={odds_format}&file_format={file_format}&key={api_key}"
     return get_data_from_api(endpoint)
-
 
 # Loop through all tours and years
 for tour in tours:
@@ -133,6 +137,11 @@ for tour in tours:
             matchups_file_path = os.path.join(csv_file_path, matchups_file_name)
             with open(matchups_file_path, 'w') as file:
                 file.write(matchups)
+
+            # Sanitize the CSV data
+            df_raw_data = sanitize_csv_data(pd.read_csv(raw_data_file_path))
+            df_outrights = sanitize_csv_data(pd.read_csv(outrights_file_path))
+            df_matchups = sanitize_csv_data(pd.read_csv(matchups_file_path))
 
         # You can further process the DataFrames if needed
         # Concatenate or merge the DataFrames, perform additional operations, etc.
