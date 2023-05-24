@@ -94,10 +94,11 @@ def get_historical_matchups(tour, event_id, year, book, odds_format, file_format
 # Loop through all tours and years
 for tour in tours:
     for year in years:
+        # Optionally, you can also parse the data as DataFrames if needed
         # Initialize empty DataFrames
-        df_raw_data = pd.DataFrame()
-        df_outrights = pd.DataFrame()
-        df_matchups = pd.DataFrame()
+        # df_raw_data = pd.DataFrame()
+        # df_outrights = pd.DataFrame()
+        # df_matchups = pd.DataFrame()
 
         for book in books:
             # Print debugging information
