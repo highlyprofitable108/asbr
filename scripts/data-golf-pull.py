@@ -68,7 +68,7 @@ def get_round_scoring_stats_strokes_gained(tour, event_id, year, file_format):
     return get_data_from_api(endpoint)
 
 
-def get_historical_odds_data_event_ids(tour='pga', file_format):
+def get_historical_odds_data_event_ids(tour, file_format):
     endpoint = f"{base_url}/historical-odds/event-list?tour={tour}&file_format={file_format}&key={api_key}"
     return get_data_from_api(endpoint)
 
