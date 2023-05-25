@@ -2,6 +2,7 @@ import os
 import glob
 import sqlite3
 import csv
+from collections import defaultdict
 
 # Path to SQLite database file
 database_path = '/Users/michaelfuscoletti/Desktop/data/pgatour.db'
@@ -9,17 +10,18 @@ database_path = '/Users/michaelfuscoletti/Desktop/data/pgatour.db'
 # Path to CSV files
 csv_file_path = '/Users/michaelfuscoletti/Desktop/data'
 
-# Increase field size limit
-csv.field_size_limit(1000000)
-
 # Connect to the SQLite database
 conn = sqlite3.connect(database_path)
 cursor = conn.cursor()
 
-# Table creation statements (replace with your own table definitions)
-table_statements = [
-    '''
-    CREATE TABLE IF NOT EXISTS raw_data (
+# Function to create table
+def create_table(table_name, table_statement):
+    cursor.execute(f'CREATE TABLE IF NOT EXISTS {table_name} {table_statement}')
+
+# Table creation definitions
+table_definitions = {
+    'raw_data': '''
+    (
         tour TEXT,
         year INTEGER,
         season INTEGER,
@@ -48,8 +50,8 @@ table_statements = [
         prox_fw REAL
     )
     ''',
-    '''
-    CREATE TABLE IF NOT EXISTS matchups (
+    'matchups': '''
+    (
         p3_outcome_text TEXT,
         p3_close REAL,
         p3_player_name TEXT,
@@ -80,8 +82,8 @@ table_statements = [
         event_id INTEGER
     )
     ''',
-    '''
-    CREATE TABLE IF NOT EXISTS outrights (
+    'outrights': '''
+    (
         outcome TEXT,
         close_time TEXT,
         open_time TEXT,
@@ -100,57 +102,60 @@ table_statements = [
         event_id INTEGER
     )
     '''
-]
+}
 
 # Execute table creation statements
-for table_statement in table_statements:
-    cursor.execute(table_statement)
+for table_name, table_statement in table_definitions.items():
+    create_table(table_name, table_statement)
 
-# Get the latest version of each CSV file
-latest_files = {}
-for file_path in glob.glob(os.path.join(csv_file_path, '*.csv')):
-    file_name = os.path.basename(file_path)
-    file_name_no_ext = os.path.splitext(file_name)[0]  # Remove the file extension
-    if file_name_no_ext not in latest_files:
-        latest_files[file_name_no_ext] = file_path
-    else:
-        current_mtime = os.path.getmtime(file_path)
-        previous_mtime = os.path.getmtime(latest_files[file_name_no_ext])
-        if current_mtime > previous_mtime:
-            latest_files[file_name_no_ext] = file_path
+# Dictionary for the files 
+table_files = defaultdict(list)
+
+# Get all CSV files that match table names
+for root, dirs, files in os.walk(csv_file_path):
+    for file in files:
+        if file.endswith(".csv"):
+            file_path = os.path.join(root, file)
+            
+            # Continue to next file if current file size is 0
+            if os.path.getsize(file_path) == 0:
+                print(f"Skipping empty file: {file_path}")
+                continue
+
+            for table_name in table_definitions.keys():
+                if table_name in file:
+                    table_files[table_name].append(file_path)
+                    break
 
 # Process CSV files
-for file_path in latest_files.values():
-    print(f"Processing file: {file_path}")
+for table_name, file_paths in table_files.items():
+    for file_path in file_paths:
+        print(f"Processing file: {file_path}")
+        if table_name in table_definitions:
+            with open(file_path, 'r', newline='', encoding='utf-8-sig') as file:
+                reader = csv.reader(file, delimiter=',', quotechar='"')
+                header = next(reader, None) 
 
-    # Determine the table name based on the file name without the timestamp
-    table_name = os.path.splitext(os.path.basename(file_path))[0].rsplit('_', 1)[0]
+                # If raw_data file has 28 columns, ignore the last two columns
+                if table_name == "raw_data" and len(header) == 28:
+                    header = header[:-2]
+                    reader = (row[:-2] + [None]*(len(header)-len(row[:-2])) for row in reader)
 
-    # Get the expected number of columns for the table
-    if table_name == 'raw_data':
-        expected_columns = 27
-    elif table_name == 'matchups':
-        expected_columns = 28
-    elif table_name == 'outrights':
-        expected_columns = 16
-    else:xs\\
-        expected_columns = 0  # Adjust based on your table's column count
+                # Check for expected number of columns based on table definitions
+                expected_columns = len(table_definitions[table_name].split(',')) 
+                if header is not None and len(header) == expected_columns:
+                    columns = ', '.join(header)
+                    placeholders = ', '.join(['?'] * len(header))
+                    query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                    cursor.executemany(query, reader)
+                else:
+                    print(f"Unexpected number of columns in {file_path}. Expected {expected_columns}, but found {len(header)}.")
 
-    # Insert data into the table
-    with open(file_path, 'r', newline='') as file:
-        reader = csv.reader(file)
-        header = next(reader, None)  # Use next() function with a default value of None
-        if header is not None and len(header) == expected_columns:
-            # Remove the _timestamp portion from the header
-            header = [column.split('_')[0] for column in header]
-            
-            columns = ', '.join(header)
-            placeholders = ', '.join(['?'] * len(header))
-            query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-            cursor.executemany(query, reader)
+        else:
+            print(f"Unknown table: {table_name}. Skipping this file.")
 
-    # Commit the changes to the database
-    conn.commit()
+# Commit the changes to the database
+conn.commit()
 
 # Close the database connection
 conn.close()
