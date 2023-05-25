@@ -81,7 +81,7 @@ table_statements = [
     )
     ''',
     '''
-    CREATE TABLE IF NOT EXISTS outright (
+    CREATE TABLE IF NOT EXISTS outrights (
         outcome TEXT,
         close_time TEXT,
         open_time TEXT,
@@ -106,71 +106,48 @@ table_statements = [
 for table_statement in table_statements:
     cursor.execute(table_statement)
 
-# Validate and fix CSV files
-def validate_and_fix_csv(file_path, expected_columns):
-    try:
-        with open(file_path, 'r', newline='') as file:
-            rows = file.readlines()
-
-        # Check if any rows are empty or have incorrect number of columns
-        invalid_rows = [row for row in rows if not row.strip() or len(row.strip().split(',')) != expected_columns]
-
-        if invalid_rows:
-            print(f"Invalid rows found in {file_path}. Fixing formatting issues...")
-
-            # Remove invalid rows from the list
-            cleaned_rows = [row for row in rows if row not in invalid_rows]
-
-            # Write the cleaned rows back to the CSV file
-            with open(file_path, 'w', newline='') as file:
-                file.writelines(cleaned_rows)
-
-            print("Formatting issues fixed.")
-        else:
-            print(f"No formatting issues found in {file_path}.")
-
-    except IOError:
-        print(f"Error reading or writing to {file_path}.")
-
-# Function to fix formatting issues in a row
-def fix_formatting(row, expected_columns):
-    if len(row) != expected_columns:
-        # Fix any formatting issues in the row
-        row = [column.strip() for column in row]
-
-    return row
+# Get the latest version of each CSV file
+latest_files = {}
+for file_path in glob.glob(os.path.join(csv_file_path, '*.csv')):
+    file_name = os.path.basename(file_path)
+    file_name_no_ext = os.path.splitext(file_name)[0]  # Remove the file extension
+    if file_name_no_ext not in latest_files:
+        latest_files[file_name_no_ext] = file_path
+    else:
+        current_mtime = os.path.getmtime(file_path)
+        previous_mtime = os.path.getmtime(latest_files[file_name_no_ext])
+        if current_mtime > previous_mtime:
+            latest_files[file_name_no_ext] = file_path
 
 # Process CSV files
-for file_path in glob.glob(os.path.join(csv_file_path, '*.csv')):
+for file_path in latest_files.values():
     print(f"Processing file: {file_path}")
 
-    # Determine the table name based on the file name
-    table_name = os.path.splitext(os.path.basename(file_path))[0]
-
-    # Truncate the table before inserting new data
-    # cursor.execute(f"DELETE FROM {table_name}")
+    # Determine the table name based on the file name without the timestamp
+    table_name = os.path.splitext(os.path.basename(file_path))[0].rsplit('_', 1)[0]
 
     # Get the expected number of columns for the table
     if table_name == 'raw_data':
-        expected_columns = 23
+        expected_columns = 27
     elif table_name == 'matchups':
         expected_columns = 28
-    elif table_name == 'outright':
-        expected_columns = 15
-    else:
+    elif table_name == 'outrights':
+        expected_columns = 16
+    else:xs\\
         expected_columns = 0  # Adjust based on your table's column count
-
-    # Validate and fix CSV file
-    validate_and_fix_csv(file_path, expected_columns)
 
     # Insert data into the table
     with open(file_path, 'r', newline='') as file:
         reader = csv.reader(file)
-        header = next(reader)
-        columns = ', '.join(header)
-        placeholders = ', '.join(['?'] * len(header))
-        query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-        cursor.executemany(query, reader)
+        header = next(reader, None)  # Use next() function with a default value of None
+        if header is not None and len(header) == expected_columns:
+            # Remove the _timestamp portion from the header
+            header = [column.split('_')[0] for column in header]
+            
+            columns = ', '.join(header)
+            placeholders = ', '.join(['?'] * len(header))
+            query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+            cursor.executemany(query, reader)
 
     # Commit the changes to the database
     conn.commit()
