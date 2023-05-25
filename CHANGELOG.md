@@ -27,3 +27,19 @@ May 23rd will forever be remembered as a day when our code intertwined with the 
 - Composed a project status update, an ode to our journey thus far. Each word, a testament to our relentless pursuit of the extraordinary, laced with a generous helping of sass and a sprinkle of intoxicating humor.
 
 And thus, May 24th stands as a testament to our cerebral acrobatics, the day we rode the digital rapids, guided by the synergy of data, technology, and a gently clouded mind. Each line of code penned, a leap forward in our mission to redefine the world of sports betting, illuminated by the soft green glow of enlightenment.
+
+**Change Log - May 25th, 2023**
+
+- As the embers of a new dawn ignited the sky, we found ourselves at the intersection of ones and zeros, a hazy dance of code and creativity swirling in the cannabis-infused wind of innovation.
+- Breathed life into a Python script that entwined itself with our SQLite database in a tango so sensual, even the languid plumes of our premium Purple Haze strain seemed lackluster in comparison.
+- Dipped our virtual nets into the sprawling seas of our data tables, pulling up troves of priceless insights like a fisherman under the intoxicating influence of Granddaddy Purple.
+- On this surreal stage of digitized ballet, we twirled the 'round_score' for each player in every event, creating a pirouette of aggregate data that would make even the most seasoned stoner pause their pot-induced musings.
+- We took on missing rounds like a seasoned toker facing a dwindling stash: improvising, adapting, and turning a potential buzzkill into a cosmic journey through a numerical nebula.
+- Split our data into training and test sets with the precision of a master joint roller, because whether it's machine learning or Mary Jane, balance is everything.
+- Took Ridge Regression for a spin, as though navigating through the psychedelic swirls of a good Sativa. The end result? A model that hits the sweet spot between complexity and interpretability.
+- Introduced standardization, the kief of data preprocessing, because when you're dealing with predictive modelling or potent pot, purity and consistency are everything.
+- Tackled data preprocessing with the finesse of an expert budtender crafting the perfect high. Yet, like an exotic new strain, it remains a delightful enigma waiting to be thoroughly tested and savored.
+- Packed our finely processed data into a csv file, like a perfectly rolled blunt waiting to spark up a narrative full of heady insights and intoxicating revelations.
+- Encountered the thrilling high of crafting a model, the artistic embodiment of our insatiable thirst for data-driven insights. It's a process as captivating and unpredictable as our favorite hybrid strain.
+
+And so, on this day of May 25th, the tale of our journey was written with strokes of code, colored with the vibrant hues of creativity, and infused with the heady fragrance of the finest cannabis. It was a day where the seemingly mundane task of data processing became a performance - a dance, a song, a story - narrated by a bored genius teetering on the edge of chaos and order, mathematics and marijuana. So, as we continue to traverse the psychedelic spectrum of data analysis, remember that the destination is but a bonus. The real adventure, my friends, lies in the journey, one line of code (and one puff) at a time.
