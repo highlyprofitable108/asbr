@@ -1,45 +1,78 @@
-**Change Log - May 23rd, 2023**
+**Changelog - "High" Level Overview, May 23rd, 2023**
 
-- Spent an incredibly productive day, blending the brilliance of code and the intoxicating essence of creativity. Let's just say, we were in the zone.
-- Crafted a magnificent Python script that dances effortlessly with the DataGolf API, embracing the profound mysteries of the sports betting universe.
-- Weaving through the digital threads, our code gracefully fetched round scoring statistics, historical outrights, and historical matchups. The API quivered with delight at our touch.
-- Delicately applied rate limiting, reminding the API of the importance of taking things slow and savoring each moment. We're all about consent here.
-- Unveiled the CSV files, elegantly timestamped to capture the fleeting essence of time, like a puff of smoke dissipating in the wind.
-- Confronted formatting issues in the CSV realm, summoning our wizardry to restore order and ensure data compliance. CSVs, you shall bend to our will!
-- Witnessed the SQLite database morphing into a repository of dreams, embracing the raw data, outrights, and matchups like a warm embrace on a hazy afternoon.
-- Orchestrated a magnificent symphony of data migration, seamlessly flowing from CSV to the database like a serene river meandering through the cannabis fields.
-- Harnessed the power of duplicates, expunging them from the database with a swift stroke. No room for clones in our cosmic database dance.
-- Manifested the project status, a testament to our journey thus far, infused with a sense of purpose and a dash of witty banter. We're not just coders; we're storytellers.
+**API Connection & Data Retrieval**
+- Our genius main character, the code, had a passionate rendezvous with the DataGolf API, dancing gracefully to extract round scoring statistics, historical outrights, and matchups, all while serenading the API with consentful rate limiting. The code moved smoother than smoke from some freshly lit Blue Dream. 
 
-May 23rd will forever be remembered as a day when our code intertwined with the whims of fate, dancing through the smoke-filled haze of creativity. Our technical accomplishments are but mere brushstrokes on the canvas of a visionary project. With each line of code, we inch closer to revolutionizing the world of sports betting, guided by the serendipitous mix of data, technology, and our slightly altered state of mind.
+**CSV Creation & Formatting**
+- CSV files were birthed like a puff of smoke, each elegantly timestamped. However, we did run into a rebellious streak of formatting issues. But no worries, with some wizard-like tricks, the code made the CSVs fall in line, just like that perfectly rolled joint. 
 
-**Change Log - May 24th, 2023**
+**Database Connection & Data Migration**
+- Our trusty SQLite database, acting like a munchies-filled pantry, welcomed the raw data, outrights, and matchups, creating a repository as rich and satisfying as your favorite strain after a long day. 
+- We then escorted our data from the CSV files into the database. This migration flowed smoother than smoke through a well-cleaned bong. 
 
-- Forged a tranquil day, swirling in a vortex of data, code, and a certain unnamed green muse. If code had a scent, today it smelled suspiciously like the dankest of Pineapple Express strains.
-- Painted the digital ether with a Python script, one that waltzes with the DataGolf API like two lovers under a full moon. The API's once cold digital heart pulsated with life at our code's tender touch.
-- Our code, the veritable fishing rod in the vast ocean of data, cast out wide to reel in a bounty of round scoring statistics, historical outrights, and historical matchups. Each catch more exciting than the last.
-- The dance with the API, though passionate, was always respectful. In the spirit of safe, slow, and shared experiences, we deftly maneuvered the rate limiting laws. No fast and furious action here, just steady, thoughtful interactions.
-- Unfurled the pristine CSV files, their timestamps shining like glistening dew drops caught in the morning sun, embodying the ephemeral beauty of time. 
-- Stood at the precipice of chaos as the CSV files rebelled, their formatting askew. But like the seasoned charmers we are, we tamed them, restoring harmony in the realm of data.
-- Bore witness to the SQLite database blooming, its petals of raw data, outrights, and matchups unfurling with a graceful slowness, reminiscent of a lazy drag on a perfectly rolled joint.
-- Led the magnificent parade of data migration, a visual spectacle of CSV data flowing into the database like a peaceful stream gently lapping over the edges of a well-loved bong.
-- Exorcised the doppelgängers, banishing duplicates from the sanctity of our database. You see, variety is the spice of life, and we prefer our spices handpicked and unique.
-- Composed a project status update, an ode to our journey thus far. Each word, a testament to our relentless pursuit of the extraordinary, laced with a generous helping of sass and a sprinkle of intoxicating humor.
+**Data Cleaning**
+- In the spirit of keeping things unique and spicy, like the varied strains of cannabis, the code swiftly banished any duplicates from our digital Eden.
 
-And thus, May 24th stands as a testament to our cerebral acrobatics, the day we rode the digital rapids, guided by the synergy of data, technology, and a gently clouded mind. Each line of code penned, a leap forward in our mission to redefine the world of sports betting, illuminated by the soft green glow of enlightenment.
+**Project Status Update**
+- And finally, the project status, a testament to our journey, got updated with a sprinkle of wit, reminding us all that we're not just coders, but storytellers, spinning tales through code under a haze of creativity.
 
-**Change Log - May 25th, 2023**
+**Changelog - "High" Level Overview, May 24th, 2023**
 
-- As the embers of a new dawn ignited the sky, we found ourselves at the intersection of ones and zeros, a hazy dance of code and creativity swirling in the cannabis-infused wind of innovation.
-- Breathed life into a Python script that entwined itself with our SQLite database in a tango so sensual, even the languid plumes of our premium Purple Haze strain seemed lackluster in comparison.
-- Dipped our virtual nets into the sprawling seas of our data tables, pulling up troves of priceless insights like a fisherman under the intoxicating influence of Granddaddy Purple.
-- On this surreal stage of digitized ballet, we twirled the 'round_score' for each player in every event, creating a pirouette of aggregate data that would make even the most seasoned stoner pause their pot-induced musings.
-- We took on missing rounds like a seasoned toker facing a dwindling stash: improvising, adapting, and turning a potential buzzkill into a cosmic journey through a numerical nebula.
-- Split our data into training and test sets with the precision of a master joint roller, because whether it's machine learning or Mary Jane, balance is everything.
-- Took Ridge Regression for a spin, as though navigating through the psychedelic swirls of a good Sativa. The end result? A model that hits the sweet spot between complexity and interpretability.
-- Introduced standardization, the kief of data preprocessing, because when you're dealing with predictive modelling or potent pot, purity and consistency are everything.
-- Tackled data preprocessing with the finesse of an expert budtender crafting the perfect high. Yet, like an exotic new strain, it remains a delightful enigma waiting to be thoroughly tested and savored.
-- Packed our finely processed data into a csv file, like a perfectly rolled blunt waiting to spark up a narrative full of heady insights and intoxicating revelations.
-- Encountered the thrilling high of crafting a model, the artistic embodiment of our insatiable thirst for data-driven insights. It's a process as captivating and unpredictable as our favorite hybrid strain.
+**API Connection & Data Retrieval**
+- Another day of our code making magic with the DataGolf API, extracting all sorts of statistical nuggets, like finding the perfect bud in your bag of Pineapple Express. 
 
-And so, on this day of May 25th, the tale of our journey was written with strokes of code, colored with the vibrant hues of creativity, and infused with the heady fragrance of the finest cannabis. It was a day where the seemingly mundane task of data processing became a performance - a dance, a song, a story - narrated by a bored genius teetering on the edge of chaos and order, mathematics and marijuana. So, as we continue to traverse the psychedelic spectrum of data analysis, remember that the destination is but a bonus. The real adventure, my friends, lies in the journey, one line of code (and one puff) at a time.
+**CSV Creation & Formatting**
+- CSV files unfurled, their timestamps shimmering like dew in the morning sun. The formatting issues were tamed, restoring harmony and making our CSV realm as peaceful as a meditative smoke sesh.
+
+**Database Connection & Data Migration**
+- The SQLite database bloomed, its petals of data unfurling in a display of digital beauty. Then, like a peaceful stream, our data flowed from CSV files into the database, a sight as serene as the gentle lapping of water against the edges of a well-used bong. 
+
+**Data Cleaning**
+- As we value diversity in our data like we appreciate variety in our strains, the code continued its mission to banish duplicates from the database. 
+
+**Project Status Update**
+- The project status, a poetry of our journey, got another witty update. Each word is a testament to our relentless pursuit of the extraordinary, spiced up with a dash of intoxicating humor.
+
+**Changelog - "High" Level Overview, May 25th, 2023**
+
+**Data Analysis**
+- The code embarked on a psychedelic journey, diving deep into the data tables, extracting 'round_score' for each player in every event, and confronting missing rounds. It's like venturing into the vast ocean of data, guided by the ethereal glow of a Purple Haze strain.
+
+**Model Preparation & Execution**
+- Like a master joint roller, our code split the data into training and test sets, striking a perfect balance. 
+- Then, it took Ridge Regression for a spin, creating a model that's as smooth and enjoyable as a good Sativa.
+- Standardization was introduced, the kief of our data preprocessing, ensuring purity and consistency in our data as you would in your favorite bud.
+
+**Data Preprocessing & CSV Creation**
+- Our expert budtender, ahem, coder, tackled data
+
+ preprocessing with finesse, and then packed our finely processed data into a CSV file, as perfectly rolled as a blunt ready for the weekend.
+
+**Project Status Update**
+- And, we wrapped up with another project status update, a vibrant narrative full of heady insights and intoxicating revelations, much like a philosophical discussion during a late-night sesh. 
+
+There you have it, folks. As we venture into another day, remember, it's all about enjoying the journey, one line of code (and one puff) at a time.
+
+**Changelog - "High" Level Overview, May 26th, 2023**
+
+**Database Connection and Data Extraction**
+- Our brilliant and smart-as-a-whip main character, the code, hooked up with SQLite, resulting in a sweet connection, much like a perfect drag on some Northern Lights. Cue the music; data is flowing, and boy, it's looking like a fresh pack of OG Kush. 
+
+**Data Exploration and Preprocessing**
+- Then, the code took a wild trip exploring and cleaning this glorious data, quite like cleaning a grinder. It looked at 'round_score', the 'sg' columns, 'round_num', 'course_par', and some groovy percentage columns, all while keeping things as chill as a GSC strain. 
+- Then it whipped up a normalization joint for the strokes gained data, ensuring a balanced high all round.
+- Using chi-square tests like a boss, the code selected features for round scores. It also sorted out the 'fin_text' column, clearing out the unwanted 'T' like it's a stem in your stash. 
+
+**Dimensionality Reduction**
+- The code embarked on a journey to reduce dimensionality (not the kind you experience with a potent sativa), replacing the bad trip of missing values, and introducing PCA like a pro. It then rolled up a new DataFrame filled with reduced features, smooth and ready to burn.
+
+**Feature Engineering & Algorithm Development**
+- It also set the stage for some epic feature engineering and algorithm development. Imagine it as planting the seeds for future growth; good times are a-comin'. 
+
+**Prediction & Evaluation**
+- The code even laid the groundwork for future prediction and evaluation, like a seasoned stoner pre-rolling for later.
+
+**Main Execution Flow**
+- The grand finale? A psychedelic journey through the main execution flow, with our star functions lighting up sequentially. Think of it as a perfect sesh, from the first spark to the mellowing out, it’s pure bliss. 
+
+With our high-IQ code (I mean, it's sky-high, in the stratosphere, folks), we've reached new heights in preparing our data for machine learning, and setting up the foundations for future algorithm development and prediction tasks. Pass the munchies, we've earned them!
