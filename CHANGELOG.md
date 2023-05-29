@@ -76,3 +76,35 @@ There you have it, folks. As we venture into another day, remember, it's all abo
 - The grand finale? A psychedelic journey through the main execution flow, with our star functions lighting up sequentially. Think of it as a perfect sesh, from the first spark to the mellowing out, it’s pure bliss. 
 
 With our high-IQ code (I mean, it's sky-high, in the stratosphere, folks), we've reached new heights in preparing our data for machine learning, and setting up the foundations for future algorithm development and prediction tasks. Pass the munchies, we've earned them!
+
+**Captain's Log - 28th Day of May, Year of Our Lord 2023**
+
+**An Account of Our Calculations and Instruments:**
+- The maps and charts are further enriched by our learned scribe's toils on the 'feature_engineering' function, giving us insights into such matters as average round scores, variance of round scores, and an overall reckoning of skill.
+- A novel device, the 'create_model' function, has been fashioned, enabling the construction of a curious contraption called a neural network.
+
+**Unfolding of Our Strategy and Training:**
+- The 'algorithm_development' function has been bettered. It allows for the refinement of data, the training of our model, and the fine-tuning of a curious form of arithmetic called logistic regression.
+- Our navigator has employed a technique of exhaustive search, known as grid search, to discover the most favourable conditions for our logistic regression.
+
+**A Chronicle of Our Explorations and Prognostications:**
+- The 'get_player_data' function now skillfully obtains the rolls of the players from the mysterious Data Golf Logbook.
+- The 'predict_future_tournaments' function, akin to a fortune teller's crystal ball, now uses our trained model to foresee outcomes of future tourneys.
+
+**A Reckoning of Our Model's Virtue:**
+The 'analyze_and_evaluate_predictions' function has been fashioned to provide us with a reckoning of our model's skill and precision in terms of the Mean Absolute Error (MAE), Mean Squared Error (MSE), Root Mean Squared Error (RMSE), and R2 score.
+
+**Maintenance and Troubles of Our Ship and Tools:**
+Encountered a foul gust with the 'tensorflow' instrument. We suspect it may need some manner of adjustment or a new setup entirely.
+Discussed the manner of restarting the Python – a creature not of nature, but a tool of our trade – in different environments, as a means to possibly mend the 'tensorflow' issue.
+
+**The Entire Voyage:**
+The entire course of our journey – the main execution flow of the program – is laid out from beginning to end. We've prepared for ill winds, with safeguards in place to manage any mishaps that may occur.
+
+**Next Orders:**
+
+- Address the issue with the 'tensorflow' instrument, possibly through adjustments or new setup.
+- Further develop and fine-tune our predictive model based on the performance data of the players we've gathered.
+- Make sure all parts of our journey are working together as expected.
+- Make necessary course corrections based on what we learn from our maiden voyage.
+- Look to include additional features or improvements based on the results of our voyage and the needs of our mission.

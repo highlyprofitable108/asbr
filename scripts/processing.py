@@ -1,11 +1,19 @@
 import sqlite3
+import requests
 import numpy as np
 import pandas as pd
+from io import StringIO
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.feature_selection import SelectKBest, chi2
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, LogisticRegression
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, mean_absolute_error, mean_squared_error, r2_score
+from sklearn.utils import resample
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 
 # Database connection function
 def connect_to_database(database_name):
@@ -178,33 +186,148 @@ def dimensionality_reduction(df):
     print("Dimensionality reduction complete.")  # Debugging line
     return df_processed
 
-# Feature engineering function
 def feature_engineering(df):
-    print("Starting prediction engine.")  # Debugging line
-    # Add your feature engineering steps here
-    print("Prediction engine running.")  # Debugging line
+    print("Starting feature engineering.")  # Debugging line
+
+    # Historical Performance
+    df['avg_round_score'] = df.groupby('player_name')['round_score'].transform('mean')
+
+    # Performance on Specific Course
+    df['avg_round_score_course'] = df.groupby(['player_name', 'course_name'])['round_score'].transform('mean')
+
+    # Player Consistency
+    df['std_round_score'] = df.groupby('player_name')['round_score'].transform('std')
+
+    # Overall Game Skills
+    df['overall_skill_score'] = df[['sg_putt', 'sg_arg', 'sg_app', 'sg_ott', 'sg_t2g', 'sg_total']].sum(axis=1)
+
+    # Seasonal Performance
+    # Assuming that there is a 'season' column in the data
+    df['season_avg_round_score'] = df.groupby(['player_name', 'season'])['round_score'].transform('mean')
+
+    # Player Progression
+    # Assuming that there is a 'year' column in the data
+    df['yearly_avg_round_score'] = df.groupby(['player_name', 'year'])['round_score'].transform('mean')
+    df['player_progression'] = df.groupby('player_name')['yearly_avg_round_score'].transform(lambda x: x.pct_change())
+
+    print("Feature engineering complete.")  # Debugging line
     return df
 
-# Algorithm development function
+def create_model(optimizer='adam'):
+    model = Sequential()
+    model.add(Dense(12, input_dim=7, activation='relu'))
+    model.add(Dense(8, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    return model
+
 def algorithm_development(df):
     print("Starting algorithm development.")  # Debugging line
-    # Add your algorithm development steps here
+
+    # Split data into features and target
+    X = df.drop(['fin_text'], axis=1)
+    y = df['fin_text']
+    
+    # Apply feature scaling
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
+    # Split data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Define logistic regression model
+    lr = LogisticRegression()
+
+    # Define the grid search parameters
+    param_grid = [{'C': [0.1, 1, 10, 100], 'penalty': ['l1', 'l2']}]
+
+    # Grid search for hyperparameters
+    grid = GridSearchCV(estimator=lr, param_grid=param_grid, cv=5)
+    grid_result = grid.fit(X_train, y_train)
+
+    # Get best hyperparameters
+    print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+
+    # Define the keras classifier
+    model = KerasClassifier(build_fn=create_model, epochs=50, batch_size=10, verbose=0)
+
+    # Train the model
+    model.fit(X_train, y_train, validation_data=(X_test, y_test))
+
+    # Evaluate the model
+    scores = model.evaluate(X_test, y_test)
+    print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+
+    # Finalize the model with chosen hyperparameters
+    final_model = LogisticRegression(**grid_result.best_params_)
+    final_model.fit(X_train, y_train)
+
     print("Algorithm development complete.")  # Debugging line
-    # return model
+    return final_model
 
-# Prediction function
-def predict_future_tournaments(df, model):
+def get_player_data(tour='pga', file_format='csv'):
+    url = f"https://feeds.datagolf.com/field-updates?tour={tour}&file_format={file_format}&key=195c3..."
+
+    # Send a GET request to the API
+    response = requests.get(url)
+
+    # Raise an exception if the request was unsuccessful
+    response.raise_for_status()
+
+    # If the requested file format is CSV
+    if file_format.lower() == 'csv':
+        data = pd.read_csv(StringIO(response.text))
+
+    # Return the data
+    return data
+
+def predict_future_tournaments(players_list, df_historical, model):
     print("Starting sim of upcoming tournament.")  # Debugging line
-    # Add your prediction steps here
-    print("Prediction of future tournaments complete.")  # Debugging line
-    # return predictions
 
-# Evaluation function
+    # Fetch historical data for the players in the future tournament
+    df_future = df_historical[df_historical['player_name'].isin(players_list)]
+
+    # Preprocessing the players' historical data
+    df_future_preprocessed = explore_and_preprocess_data(df_future)
+    
+    # Feature engineering
+    df_future_fe = feature_engineering(df_future_preprocessed)
+
+    # Drop the 'fin_text' column as it is the target variable and wouldn't be present in future data
+    df_future_fe = df_future_fe.drop(['fin_text'], axis=1)
+    
+    # Apply feature scaling
+    scaler = StandardScaler()
+    df_future_fe_scaled = scaler.fit_transform(df_future_fe)
+
+    # Use the model to make predictions
+    predictions = model.predict(df_future_fe_scaled)
+    
+    print("Prediction of future tournaments complete.")  # Debugging line
+    
+    return predictions
+
 def analyze_and_evaluate_predictions(predictions, actual_results):
-    print("Starting analysis of best bets.")  # Debugging line
-    # Add your analysis and evaluation steps here
-    print("Almost there!")  # Debugging line
-    # return evaluation_metrics
+    print("Starting analysis of player finishes.")  # Debugging line
+
+    # Compute and print the MAE
+    mae = mean_absolute_error(actual_results, predictions)
+    print(f"Mean Absolute Error: {mae}")
+
+    # Compute and print the MSE
+    mse = mean_squared_error(actual_results, predictions)
+    print(f"Mean Squared Error: {mse}")
+
+    # Compute and print the RMSE
+    rmse = np.sqrt(mse)
+    print(f"Root Mean Squared Error: {rmse}")
+
+    # Compute and print the R2 score
+    r2 = r2_score(actual_results, predictions)
+    print(f"R2 Score: {r2}")
+
+    # Return the metrics
+    return mae, mse, rmse, r2
 
 # Main execution flow
 if __name__ == '__main__':
@@ -212,10 +335,12 @@ if __name__ == '__main__':
         conn = connect_to_database('/Users/michaelfuscoletti/Desktop/data/pgatour.db')
         data = retrieve_data(conn, 'raw_data')
         data = explore_and_preprocess_data(data)
+        create_model()
         data = feature_engineering(data)
         model = algorithm_development(data)
-        # predictions = predict_future_tournaments(data, model)
-        # evaluation_metrics = analyze_and_evaluate_predictions(predictions, actual_results)
-        # print("Execution complete.")  # Debugging line
+        players_list = get_player_data
+        predictions = predict_future_tournaments(players_list, data, model)
+        evaluation_metrics = analyze_and_evaluate_predictions(predictions, actual_results)
+        print("Execution complete.")  # Debugging line
     except Exception as e:
         print(f"Execution error: {e}")  # Debugging line
