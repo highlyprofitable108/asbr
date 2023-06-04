@@ -2,102 +2,33 @@ import os
 import glob
 import sqlite3
 import csv
+import json
 from collections import defaultdict
 
 # Path to SQLite database file
-database_path = '/Users/michaelfuscoletti/Desktop/data/pgatour.db'
+database_path = '/Users/michaelfuscoletti/Desktop/data/{sport}.db'
 
 # Path to CSV files
-csv_file_path = '/Users/michaelfuscoletti/Desktop/data'
+csv_file_path = '/Users/michaelfuscoletti/Desktop/data/{sport}'
 
-# Table creation definitions
-table_definitions = {
-    'raw_data': '''
-    (
-        tour TEXT,
-        year INTEGER,
-        season INTEGER,
-        event_completed TEXT,
-        event_name TEXT,
-        event_id INTEGER,
-        player_name TEXT,
-        dg_id INTEGER,
-        fin_text TEXT,
-        round_num INTEGER,
-        course_name TEXT,
-        course_num INTEGER,
-        course_par INTEGER,
-        round_score INTEGER,
-        sg_putt REAL,
-        sg_arg REAL,
-        sg_app REAL,
-        sg_ott REAL,
-        sg_t2g REAL,
-        sg_total REAL,
-        driving_dist REAL,
-        driving_acc REAL,
-        gir REAL,
-        scrambling REAL,
-        prox_rgh REAL,
-        prox_fw REAL
-    )
-    ''',
-    'matchups': '''
-    (
-        p3_outcome_text TEXT,
-        p3_close REAL,
-        p3_player_name TEXT,
-        p2_outcome_text TEXT,
-        p2_outcome REAL,
-        close_time TEXT,
-        bet_type TEXT,
-        p1_outcome_text TEXT,
-        p3_open REAL,
-        p2_open REAL,
-        p3_dg_id INTEGER,
-        p1_outcome REAL,
-        tie_rule TEXT,
-        p2_close REAL,
-        p1_open REAL,
-        p2_dg_id INTEGER,
-        p3_outcome REAL,
-        p1_dg_id INTEGER,
-        p1_player_name TEXT,
-        open_time TEXT,
-        p2_player_name TEXT,
-        p1_close REAL,
-        book TEXT,
-        event_completed TEXT,
-        event_name TEXT,
-        season INTEGER,
-        year INTEGER,
-        event_id INTEGER
-    )
-    ''',
-    'outrights': '''
-    (
-        outcome TEXT,
-        close_time TEXT,
-        open_time TEXT,
-        open_odds REAL,
-        close_odds REAL,
-        player_name TEXT,
-        bet_outcome_text TEXT,
-        bet_outcome_numeric REAL,
-        dg_id INTEGER,
-        book TEXT,
-        event_completed TEXT,
-        event_name TEXT,
-        market TEXT,
-        season INTEGER,
-        year INTEGER,
-        event_id INTEGER
-    )
-    '''
-}
+def get_sport_type():
+    # List of valid sports
+    valid_sports = ['pgatour', 'nfl', 'ncaaf', 'ncaab', 'horse racing']
 
-def create_table(cursor, table_name, table_statement):
+    # Ask for user input
+    sport = input("Please enter the sport type (pgatour, nfl, ncaaf, ncaab, horse racing): ")
+
+    # Validate user input
+    while sport not in valid_sports:
+        print("Invalid sport type. Please try again.")
+        sport = input("Please enter the sport type (pgatour, nfl, ncaaf, ncaab, horse racing): ")
+
+    return sport
+
+def create_table(cursor, table_name, table_statement, unique_columns):
     cursor.execute(f'CREATE TABLE IF NOT EXISTS {table_name} {table_statement}')
+    if unique_columns:
+        cursor.execute(f'CREATE UNIQUE INDEX IF NOT EXISTS idx_{table_name}_unique ON {table_name} ({", ".join(unique_columns)})')
 
 def insert_data_from_csv(cursor, table_name, table_definition, file_path):
     with open(file_path, 'r', newline='', encoding='utf-8-sig') as file:
@@ -107,12 +38,12 @@ def insert_data_from_csv(cursor, table_name, table_definition, file_path):
         if header is not None and len(header) == expected_columns:
             columns = ', '.join(header)
             placeholders = ', '.join(['?'] * len(header))
-            query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+            query = f"INSERT OR IGNORE INTO {table_name} ({columns}) VALUES ({placeholders})"
             cursor.executemany(query, reader)
         else:
             print(f"Unexpected number of columns in {file_path}. Expected {expected_columns}, but found {len(header)}.")
 
-def process_files(cursor):
+def process_files(cursor, table_definitions):
     table_files = defaultdict(list)
     for root, dirs, files in os.walk(csv_file_path):
         for file in files:
@@ -134,13 +65,41 @@ def process_files(cursor):
                 print(f"Unknown table: {table_name}. Skipping this file.")
 
 def main():
+    sport = get_sport_type()
+    
+    # Update the paths
+    global database_path
+    global csv_file_path
+    database_path = database_path.format(sport=sport)
+    csv_file_path = csv_file_path.format(sport=sport)
+    
+    with open(f'{sport}_table_definitions.json') as f:
+        table_definitions = json.load(f)
+    
     # Connect to the SQLite database
     with sqlite3.connect(database_path) as conn:
         cursor = conn.cursor()
         for table_name, table_statement in table_definitions.items():
             create_table(cursor, table_name, table_statement)
-        process_files(cursor)
+        process_files(cursor, table_definitions)
         conn.commit()
 
-if __name__ == "__main__":
-    main()
+def main():
+    sport = get_sport_type()
+
+    # Update the paths
+    global database_path
+    global csv_file_path
+    database_path = database_path.format(sport=sport)
+    csv_file_path = csv_file_path.format(sport=sport)
+    
+    with open(f'{sport}_table_definitions.json') as f:
+        table_definitions = json.load(f)
+    
+    # Connect to the SQLite database
+    with sqlite3.connect(database_path) as conn:
+        cursor = conn.cursor()
+        for table_name, data in table_definitions.items():
+            create_table(cursor, table_name, data['table_definition'], data.get('unique_columns', []))
+        process_files(cursor, table_definitions)
+        conn.commit()

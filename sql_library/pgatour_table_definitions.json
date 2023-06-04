@@ -1,0 +1,14 @@
+{
+    "raw_data": {
+        "table_definitions": "(\n    tour TEXT,\n    year INTEGER,\n    season INTEGER,\n    event_completed TEXT,\n    event_name TEXT,\n    event_id INTEGER,\n    player_name TEXT,\n    dg_id INTEGER,\n    fin_text TEXT,\n    round_num INTEGER,\n    course_name TEXT,\n    course_num INTEGER,\n    course_par INTEGER,\n    round_score INTEGER,\n    sg_putt REAL,\n    sg_arg REAL,\n    sg_app REAL,\n    sg_ott REAL,\n    sg_t2g REAL,\n    sg_total REAL,\n    driving_dist REAL,\n    driving_acc REAL,\n    gir REAL,\n    scrambling REAL,\n    prox_rgh REAL,\n    prox_fw REAL\n)",
+        "unique_columns": ["event_id", "dg_id", "tour", "year", "round_num"]
+    },
+    "matchups": {
+        "columns": "(\n    p3_outcome_text TEXT,\n    p3_close REAL,\n    p3_player_name TEXT,\n    p2_outcome_text TEXT,\n    p2_outcome REAL,\n    close_time TEXT,\n    bet_type TEXT,\n    p1_outcome_text TEXT,\n    p3_open REAL,\n    p2_open REAL,\n    p3_dg_id INTEGER,\n    p1_outcome REAL,\n    tie_rule TEXT,\n    p2_close REAL,\n    p1_open REAL,\n    p2_dg_id INTEGER,\n    p3_outcome REAL,\n    p1_dg_id INTEGER,\n    p1_player_name TEXT,\n    open_time TEXT,\n    p2_player_name TEXT,\n    p1_close REAL,\n    book TEXT,\n    event_completed TEXT,\n    event_name TEXT,\n    season INTEGER,\n    year INTEGER,\n    event_id INTEGER\n)",
+        "unique_columns": ["event_id", "year", "p1_dg_id", "p2_dg_id", "p3_dg_id", "bet_type", "book"]
+    },
+    "outrights": {
+        "definition": "(\n    outcome TEXT,\n    close_time TEXT,\n    open_time TEXT,\n    open_odds REAL,\n    close_odds REAL,\n    player_name TEXT,\n    bet_outcome_text TEXT,\n    bet_outcome_numeric REAL,\n    dg_id INTEGER,\n    book TEXT,\n    event_completed TEXT,\n    event_name TEXT,\n    market TEXT,\n    season INTEGER,\n    year INTEGER,\n    event_id INTEGER\n)",
+        "unique_columns": ["event_id", "dg_id", "book", "market", "year"]
+    }
+}

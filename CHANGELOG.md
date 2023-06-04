@@ -108,3 +108,47 @@ The entire course of our journey – the main execution flow of the program – 
 - Make sure all parts of our journey are working together as expected.
 - Make necessary course corrections based on what we learn from our maiden voyage.
 - Look to include additional features or improvements based on the results of our voyage and the needs of our mission.
+
+**Changelog - June 1, 2023 - "The Pride Edition"**
+
+- Rainbow Refactoring: The code is celebrating Pride too! We took a hard look at ourselves, and just like discovering your true self, we found that some parts of our code could use a little touch-up. We embraced our inner Pythonista, got sassy with our functions and list comprehensions, and came out more beautiful than ever. Honey, that code is now a stunner!
+
+- Prideful Processing: Our data's got all kinds of characters, and we love them all. But sometimes, sweetie, numbers have to be numbers. We had a bit of a coming out moment with our numeric columns, making sure they knew it was okay to be themselves (and numeric). We handled those special non-numeric entries like a drag queen handles a heckler – with style and grace.
+
+- Dazzling Data: We talked about our 'tour_name' column – it's just like us, unique and diverse. We recognized that the fabulousness of different tours (like our fabulous friends PGA and Korn Ferry Tour) might carry different weights. And you bet we'll consider that in our model. We're all about inclusivity here!
+Modeling and Voguing: We served some serious data science realness with our pipeline and GridSearchCV. There was a minor trip on the runway with a missing ColumnTransformer, but we sashayed away from that error by making sure our libraries strutted their stuff at the top of our script.
+
+- Performance Extravaganza: We gave you the tea on the time it might take for our GridSearchCV performance to finish. A diva needs time to prepare, darling, and so does our model. Enough time for you to vogue, grab a drink, and maybe even take a disco nap!
+
+- Serving Progress Realness: You wanted to know what's going on backstage during the GridSearchCV performance, and we served it hot! Just set the verbose level to 2 or 3, and you'll see all the drama unfolding, step by step.
+
+- StratifiedKFold Eleganza: We had a minor fashion emergency with our StratifiedKFold warning – but we took it in stride. A wise queen once said, "Don't be a drag, just be a queen", and we might have a few less queens than we thought in our 'y' variable. But we'll handle that with all the fierceness we can muster!
+That's the wrap, honey! This Pride edition was all about being true to ourselves and making sure our code was just as fabulous as we are. Let's sashay into the rest of Pride month with all the sass, flamboyance, and pride we can muster!
+
+## Changelog - June 2, 2023
+
+---
+
+### Version 2.1 - 'Vibrant Vibes'
+
+Dude, so check this, we've had a totally electrifying day. It was like being on the mainstage, with lights flashing and the crowd pulsing.
+
+#### Database Handling Upgrade
+We cranked up the volume on our Python DB script, making it more like a turntable where you can mix and match your beats. We gave it the ability to handle different sports like pgatour, nfl, ncaaf, ncaab, and horse racing, man. It's like a full-blown festival line-up! All of this while keeping things tight with unique data checks.
+
+#### Incremental Learning
+We added incremental learning to the party. It's like adding a new track to your set without stopping the music. We store the model after each training session, so when the next track (or data) comes in, we don't have to start from scratch.
+
+#### GridSearchCV
+We've been spinning the decks with GridSearchCV, tweaking parameters like a DJ tweaking the mixer. Added a couple of features there - parallel execution, verbosity settings, and duration predictions. 
+
+#### SQL Optimization
+Our SQL script was like a track that needed some remixing. We made sure the script doesn't waste time on data that's already there, kind of like not playing the same track twice, ya know?
+
+#### Horse Racing Module
+We've planned a new act in our festival - a horse racing module! We're gonna pull data from PDFs, like pulling sounds from a synth, and then jam it into SQLite tables.
+
+#### Progress so Far
+Like a day at a festival, we've been on a rollercoaster ride, man. Python scripts were refactored, GridSearchCV was fine-tuned, and SQL was optimized. But hey, the party ain't stopping yet!
+
+Alright, gotta bounce now. Gonna ride this energy into the next set. Until the next update, keep the vibes high and the beats louder!
