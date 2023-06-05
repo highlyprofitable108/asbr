@@ -113,26 +113,7 @@ def dimensionality_reduction(df):
     print("Dimensionality reduction complete")  # Debugging line
     return df_processed
 
-def feature_engineering(df):
-    print("Feature Engineering starting")  # Debugging line
 
-    # Define the columns that should contain numeric values
-    numeric_cols = ['round_score', 'sg_putt', 'sg_arg', 'sg_app', 'sg_ott', 'sg_t2g', 'sg_total', 'year', 'season', 
-                    'driving_dist', 'driving_acc', 'gir', 'scrambling', 'prox_rgh', 'prox_fw']
-
-    string_cols = [col for col in df.columns if col not in numeric_cols]
-
-    # Attempt to convert all relevant columns to numeric data types and average them
-    for col in numeric_cols:
-        df.loc[:, col] = pd.to_numeric(df[col], errors='coerce')
-        df.loc[:, f'average_{col}'] = df.groupby('player_name')[col].transform('mean')
-
-    # Processing for string columns can be added here
-    # for col in string_cols:
-        # your processing here
-
-    print("Feature Engineering complete")  # Debugging line
-    return df
 
 def create_model(optimizer='adam'):
     print("Create Model")  # Debugging line
