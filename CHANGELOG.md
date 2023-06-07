@@ -127,10 +127,6 @@ That's the wrap, honey! This Pride edition was all about being true to ourselves
 
 ## Changelog - June 2, 2023
 
----
-
-### Version 2.1 - 'Vibrant Vibes'
-
 Dude, so check this, we've had a totally electrifying day. It was like being on the mainstage, with lights flashing and the crowd pulsing.
 
 #### Database Handling Upgrade
@@ -152,3 +148,27 @@ We've planned a new act in our festival - a horse racing module! We're gonna pul
 Like a day at a festival, we've been on a rollercoaster ride, man. Python scripts were refactored, GridSearchCV was fine-tuned, and SQL was optimized. But hey, the party ain't stopping yet!
 
 Alright, gotta bounce now. Gonna ride this energy into the next set. Until the next update, keep the vibes high and the beats louder!
+
+## Changelog - June 7, 2023
+
+Well, well, well, if it ain't another day in paradise. Life is a dancefloor, and code is the beat, right? The rhythm just keeps pulsing, and the music just keeps playing. This is what went down today.
+
+#### Data Transformation Remix
+Like a DJ flipping the beat, we revamped our data handling routine. We conjured up some pivot tables for columns that were throwin' multiple rows at us, while keeping the static ones chill. It was like dropping a new rhythm while keeping the groove steady, man.
+
+#### Missing Data? Not on My Watch!
+We had some missing data in the house. Can't have that killing the vibe, can we? So we introduced IterativeImputer to the party. This dude filled in the gaps in the numeric data, letting the beat flow uninterrupted. 
+
+#### Tuning the Sound System
+Before diving into the groove, we had to make sure our data was hitting the right notes. We split our data into training and testing sets and tuned the frequencies with standard scaling. It was like getting the speakers and the mixer ready for the big show.
+
+#### The DJ Lineup
+We brought out the big guns - six models ready to rock the crowd. Linear Regression, Lasso Regression, Ridge Regression, Decision Tree, Random Forest, and Gradient Boosting - they all took turns at the decks. They gave us the tunes, and we measured the vibes with MAE, MSE, RMSE, MAPE, and R2 Score.
+
+#### Save the Best for Later
+Sometimes you play a set that's so lit, you gotta save it for later. That's why we used joblib to save our models. Now they can jump back on the decks anytime, without any prep. It's like having your playlist ready to go, anytime, anywhere.
+
+#### The Afterparty
+After a day of getting down with data and making models dance, I'm spent, man. But, looking at the refined data, the trained models, and the saved performances, it's been a day well grooved. Now, if only I could get some peace and quiet...
+
+Well, gotta take care of those yapping furballs. Until the next update, keep your code clean and your beats dirty!
