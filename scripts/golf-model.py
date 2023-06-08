@@ -114,7 +114,7 @@ param_grid = {
 }
 
 # GridSearchCV with RandomForest
-CV_rfc = GridSearchCV(estimator=RandomForestRegressor(), param_grid=param_grid, cv= 3, verbose=2)
+CV_rfc = GridSearchCV(estimator=RandomForestRegressor(), param_grid=param_grid, cv= 3, verbose=2, n_jobs=-1)
 CV_rfc.fit(X_train_scaled, y_train)
 
 # Printing the best parameters
@@ -125,7 +125,8 @@ print(CV_rfc.best_params_)
 rfc_best=RandomForestRegressor(n_estimators=CV_rfc.best_params_['n_estimators'], 
                                max_features=CV_rfc.best_params_['max_features'],
                                max_depth=CV_rfc.best_params_['max_depth'], 
-                               criterion=CV_rfc.best_params_['criterion'])
+                               criterion=CV_rfc.best_params_['criterion'],
+                               n_jobs=-1)
 
 # Fitting the model to our data
 rfc_best.fit(X_train_scaled, y_train)
