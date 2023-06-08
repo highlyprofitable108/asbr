@@ -20,12 +20,15 @@ for filename in os.listdir(directory):
         else:
             other_files.append(filename)
 
+print(f"Found {len(historical_files)} historical files and {len(other_files)} other files")
+
 # initialize an empty DataFrame for historical files
 df_historical = pd.DataFrame()
 
 # read and process historical files
 for file in historical_files:
     filepath = directory / file
+    print(f"Processing historical file: {file}")
     df_temp = pd.read_csv(filepath)  # read csv as pandas DataFrame
     df_historical = pd.concat([df_historical, df_temp])  # concatenate with the main DataFrame 
 
@@ -35,6 +38,7 @@ other_dfs = []
 # read and process other files
 for file in other_files:
     filepath = directory / file
+    print(f"Processing other file: {file}")
     df_temp = pd.read_csv(filepath)  # read csv as pandas DataFrame
     other_dfs.append(df_temp)  # append DataFrame to the list
 
@@ -43,17 +47,21 @@ df_other = pd.concat(other_dfs)
 
 # Handle missing values
 # for simplicity, we are going to fill NaNs with the mean of the respective column for numerical columns
+print("Handling missing values for other DataFrame...")
 df_other = df_other.fillna(df_other.mean())
 
 # Convert categorical values into numerical ones
+print("Converting categorical values into numerical ones for historical DataFrame...")
 df_historical['sg_categories'] = df_historical['sg_categories'].map({'yes': 1, 'no': 0})
 df_historical['traditional_stats'] = df_historical['traditional_stats'].map({'yes': 1, 'no': 0})
 
 # One-hot encoding for 'tour' column
+print("Performing one-hot encoding for 'tour' column for both DataFrames...")
 df_historical = pd.get_dummies(df_historical, columns=['tour'])
 df_other = pd.get_dummies(df_other, columns=['tour'])
 
 # Convert date column to datetime type
+print("Converting date column to datetime type for both DataFrames...")
 df_historical['date'] = pd.to_datetime(df_historical['date'])
 df_other['event_completed'] = pd.to_datetime(df_other['event_completed'])
 
@@ -61,5 +69,7 @@ df_other['event_completed'] = pd.to_datetime(df_other['event_completed'])
 output_dir = root_dir / 'data/processed_data/golf/pkl'
 
 # Save the dataframes to pickle files
+print("Saving dataframes to pickle files...")
 df_historical.to_pickle(output_dir / 'df_historical.pkl')
 df_other.to_pickle(output_dir / 'df_other.pkl')
+print("All done!")
