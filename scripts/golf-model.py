@@ -110,7 +110,7 @@ param_grid = {
     'n_estimators': [100, 200, 500],
     'max_features': ['auto', 'sqrt', 'log2'],
     'max_depth' : [4,5,6,7,8],
-    'criterion' :['mse', 'mae']
+    'criterion' :['squared_error', 'mae']
 }
 
 # GridSearchCV with RandomForest

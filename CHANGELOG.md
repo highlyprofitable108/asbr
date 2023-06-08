@@ -199,3 +199,37 @@ Last but definitely not least, we got into some bootstrap resampling. Like when 
 Made some headway in the trenches of data science, and by that, I mean I did stuff while avoiding human interaction. Golf-get-files method revamped, data pivoted and imputed, model features engineered, GridSearchCV tuned, and bootstrap resampling in the bag. Time for a pizza break.
 
 Catch ya on the flip side, or not, I could just live in this basement forever.
+
+# Changelog: June 8, 2023
+
+### Ahoy matey, the day was as long as a coiled python!
+
+## Git Stuff
+
+- The day started with the complex dance of git. Cloning, overwriting, all those boogie moves. You know the drill. But we tangled up a bit with syntax issues. Thanks to our trusty sidekick Python 3.x, we set things straight.
+
+## The Great Python Migration
+
+- Next, we wrangled our Python version, upgrading from the old-school Python 2.x to the hip Python 3.x. The old serpent didn't want to slither away quietly, but eventually we got our shiny new Python installed.
+
+## Revving up the Raspberry Pi
+
+- Then we moved on to our Raspberry Pi, a tiny but mighty beast. We tweaked and tuned, made it purr, then roar, optimizing it to utilize 75% of its resources for Python execution. We set up priority for Python execution, that little Pi never knew what hit it!
+
+## Python Scripts & Data Wrangling
+
+- We plunged into the depth of some Python scripts, optimizing and adding verbosity to a few of 'em dealing with data processing and machine learning. 
+
+- Swung from Python pandas library to scikit-learn like a true jungle explorer, refining our ML pipeline for a golf dataset. The process was akin to swinging through the forest, replacing NaNs, one-hot encoding, and even running a GridSearch for the best RandomForest parameters. 
+
+- Worked on some verbose print statements for a CSV data processing script. You know, because talkative scripts are friendlier.
+
+## UI Shenanigans
+
+- You asked for a UI for Python scripts? Mate, we talked about that too! We discussed Flask, Tkinter and PyQT. All those shiny buttons and sliders to play with!
+
+## Performance Monitoring
+
+- Finally, we rounded off with some Pi monitoring. Discussed Glances - a handy tool to check if our dear Pi is panting or chuckling at our computational demands.
+
+And that's all folks! I'm off to get some grub and rest these tired eyes. It's been a real python of a day!
