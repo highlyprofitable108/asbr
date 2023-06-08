@@ -172,3 +172,30 @@ Sometimes you play a set that's so lit, you gotta save it for later. That's why 
 After a day of getting down with data and making models dance, I'm spent, man. But, looking at the refined data, the trained models, and the saved performances, it's been a day well grooved. Now, if only I could get some peace and quiet...
 
 Well, gotta take care of those yapping furballs. Until the next update, keep your code clean and your beats dirty!
+
+## Changelog - June 8, 2023
+
+Just another "productive" day in the cozy confines of my basement. Let's dive into the rabbit hole of what's new:
+
+#### Golf Get Files Method Overhaul
+Revamped the "golf-get-files" method - a real renovation job, like turning a moldy basement into a 5-star man cave. We've got it pulling all the data we need now and parsing it correctly. A classy upgrade, kind of like swapping out your grandma's dusty old furniture for a sleek leather recliner and a pool table.
+
+#### Pivot Table Magic
+Conjured up some pivot table magic to transform and clean our data, like that time you discovered you could use a pizza box as a makeshift coffee table (don't judge, it's resourceful).
+
+#### Data Imputation
+Stuffed in missing values using a model-based imputation method. It's like filling up the holes in your life, or in this case, our data, with model predictions.
+
+#### Model Feature Engineering
+Brought some order to our features, and by order, I mean creating enough combinations to make a mathematician break out in cold sweat. Kind of like deciding which snacks to hoard when you're locked in your basement for days.
+
+#### GridSearchCV Tuning
+The real pot of gold was tuning our RandomForest model using GridSearchCV - the machine learning equivalent of endlessly tweaking your gaming settings for that sweet spot of performance and graphics.
+
+#### Boostrap Resampling
+Last but definitely not least, we got into some bootstrap resampling. Like when you've played a video game so many times you start seeing patterns, this lets us make pretty accurate guesses.
+
+#### Progress So Far
+Made some headway in the trenches of data science, and by that, I mean I did stuff while avoiding human interaction. Golf-get-files method revamped, data pivoted and imputed, model features engineered, GridSearchCV tuned, and bootstrap resampling in the bag. Time for a pizza break.
+
+Catch ya on the flip side, or not, I could just live in this basement forever.
