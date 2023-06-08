@@ -13,8 +13,13 @@ from sklearn.utils import resample
 import os
 from datetime import date
 
+# Assuming that your script is in the root project directory
+root_project_dir = os.getcwd() # gets current working directory
+
 # Load your data
-df = pd.read_pickle('/Users/michaelfuscoletti/Desktop/data/processed_data/golf/pkl/df_other.pkl')
+relative_path = "data/processed_data/golf/pkl/df_other.pkl"
+absolute_path = os.path.join(root_project_dir, relative_path)
+df = pd.read_pickle(absolute_path)
 
 # Create pivot tables for all columns that have 1-4 rows of data
 # Replace 'columns_to_pivot' with your actual column names
@@ -155,4 +160,5 @@ print(f"Mean error over {simulation_count} simulations: {np.mean(results)}")
 # Save your model with datestamp
 model_filename = f"rfc_best_{date.today().strftime('%Y-%m-%d')}.joblib"
 model_filepath = os.path.join("/Users/michaelfuscoletti/Desktop/data/processed_data/golf/", model_filename)
+absolute_path = os.path.join(root_project_dir, relative_path, model_filename)
 joblib.dump(rfc_best, model_filepath)

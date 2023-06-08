@@ -2,10 +2,13 @@ import os
 import requests
 from pathlib import Path
 
+script_dir = Path(__file__).resolve().parent
+root_dir = script_dir.parent
+
 constants = {
     'api_key': '195c3cb68dd9f46d7feaafc4829c',
     'base_url': "https://feeds.datagolf.com",
-    'file_path': Path('/Users/michaelfuscoletti/Desktop/data/raw_data/golf/csv'),
+    'file_path': root_dir / 'data/raw_data/golf/csv',  # absolute path
     'tours': ['pga'],
     'years': list(range(2017, 2023)),
     'file_format': 'csv',

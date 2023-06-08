@@ -1,8 +1,13 @@
 import os
 import pandas as pd
 import numpy as np
+from pathlib import Path
 
-directory = '/Users/michaelfuscoletti/Desktop/data/raw_data/golf/csv'
+# define the root path of the project
+root_dir = Path(__file__).resolve().parent.parent
+
+# define the directory of the raw data files
+directory = root_dir / 'data/raw_data/golf/csv'
 
 historical_files = []
 other_files = []
@@ -20,7 +25,7 @@ df_historical = pd.DataFrame()
 
 # read and process historical files
 for file in historical_files:
-    filepath = os.path.join(directory, file)
+    filepath = directory / file
     df_temp = pd.read_csv(filepath)  # read csv as pandas DataFrame
     df_historical = pd.concat([df_historical, df_temp])  # concatenate with the main DataFrame 
 
@@ -29,7 +34,7 @@ other_dfs = []
 
 # read and process other files
 for file in other_files:
-    filepath = os.path.join(directory, file)
+    filepath = directory / file
     df_temp = pd.read_csv(filepath)  # read csv as pandas DataFrame
     other_dfs.append(df_temp)  # append DataFrame to the list
 
@@ -52,6 +57,9 @@ df_other = pd.get_dummies(df_other, columns=['tour'])
 df_historical['date'] = pd.to_datetime(df_historical['date'])
 df_other['event_completed'] = pd.to_datetime(df_other['event_completed'])
 
+# define the output directory
+output_dir = root_dir / 'data/processed_data/golf/pkl'
+
 # Save the dataframes to pickle files
-df_historical.to_pickle('/Users/michaelfuscoletti/Desktop/data/processed_data/golf/pkl/df_historical.pkl')
-df_other.to_pickle('/Users/michaelfuscoletti/Desktop/data/processed_data/golf/pkl/df_other.pkl')
+df_historical.to_pickle(output_dir / 'df_historical.pkl')
+df_other.to_pickle(output_dir / 'df_other.pkl')
