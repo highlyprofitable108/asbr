@@ -233,3 +233,78 @@ Catch ya on the flip side, or not, I could just live in this basement forever.
 - Finally, we rounded off with some Pi monitoring. Discussed Glances - a handy tool to check if our dear Pi is panting or chuckling at our computational demands.
 
 And that's all folks! I'm off to get some grub and rest these tired eyes. It's been a real python of a day!
+
+# Changelog - Modeling Code
+
+*Date: June 9, 2023*
+
+This changelog reflects the changes made to the modeling code. Please note that it's written from the perspective of a high-tired sarcastic person who may or may not be doing this instead of their real job. Enjoy!
+
+## Version 1.0
+
+### Added
+
+- `load_data` function: Because apparently, we need data to do this modeling thing. Who would've thought?
+
+- `create_pivot_tables` function: Implemented this function because we love pivoting. Who needs clean, straightforward data when you can have a tangled mess of pivot tables?
+
+- `perform_knn_imputation` function: Introduced this fancy function because missing data is just too mainstream. Let's impute it with the power of KNN. It's like magic, but with numbers.
+
+- `set_up_features_and_targets` function: Created this function because we love setting things up. It's like preparing for a party, but instead of balloons and streamers, we have features and targets. So exciting!
+
+- `train_and_evaluate_model` function: Added the star of the show. It's where the real action happens. We initialize a scaler, fit it, transform the training data, transform the test data, define hyperparameters to tune, perform GridSearchCV with RandomForest, and evaluate the model. Phew! We're doing so much, it's like running a marathon while juggling flaming torches.
+
+- `simulate` function: Implemented this for all the simulation enthusiasts out there. We resample the training data, create a RandomForestRegressor, fit it, predict on the test data, and calculate the mean absolute error. It's like a mini model within a model. Meta-modeling, anyone?
+
+- `run_simulations` function: Introduced this function to run simulations in parallel. We create a pool of worker processes, distribute the simulations, and collect the results. It's like a simulation party, where everyone does their own thing and we wait for the results to come rolling in.
+
+- `save_model` function: Added this to save our beloved best model. We give it a fancy datestamp name because models need fancy names, don't they? Saving it for future use, just like a squirrel saving acorns for winter.
+
+### Updated
+
+- `main` function: Updated to bring everything together. We load the data, perform transformations, set up features and targets, train and evaluate the model, run simulations because we love simulations, and finally save the best model. It's like conducting a whole orchestra, with each function playing its own unique tune.
+
+### Miscellaneous
+
+- Sprinkled a healthy dose of sarcasm and tiredness throughout the code because let's be honest, who wouldn't be sarcastic and tired when they're doing this instead of their real job? But hey, we're making progress, one line of code at a time.
+
+---
+
+## Changelog for 6-12-23
+
+- Injected some coding magic to summon a trained model from the abyss of a joblib file.
+- The conjured model turned out to be a mischievous Random Forest Regressor, specialized in divining golf outcomes.
+- The code demanded details from the model, and we obliged by revealing its enigmatic parameters.
+- We uncovered the model's secrets, including its number of estimators, criterion for making decisions, maximum depth like a philosophical tree, and preferences for splitting samples and growing leaves.
+- Curiosity piqued our interest, and we unleashed the mystical power of feature importances.
+- The model unveiled the importance of each feature, shedding light on the golfing mysteries hidden within.
+- We captured these revelations and inscribed them in the sacred book of feature importances.
+- As the final act of this enchantment, a magnificent plot emerged, showcasing the feature importances in a vibrant bar dance.
+- The plot offered a visual feast, where the importance of each feature flaunted its height with pride, as if competing for attention.
+- However, let it be known that this magical code holds no power over kidney stones or the quest for pain relief.
+- Seek solace in the realms of medicine and consult wise healers for remedies to your physical ailments.
+
+Note: The author of this code may or may not have been under the influence of magical potions, inducing peculiar levels of creativity, sass, and humor.
+
+# Golf Code Changelog - June 13, 2023
+
+## Features Implemented
+1. **Multiple Score Derivation**: In our quest for enhanced predictive capabilities, we bid farewell to the individual score functions (e.g., sg_putt_1, sg_arg_1) and embraced a more comprehensive approach. Now, our code derives the four most likely scores for each player, unlocking a new realm of understanding and capturing the intricacies of their performance.
+
+## Enhancements
+1. **Improved Predictive Accuracy**: Through extensive simulations and the utilization of softmax function, our code now provides more accurate predictions of tournament performance. Mean scores and standard deviations are calculated, enabling a deeper understanding of players' potential and their odds of victory.
+
+## Bug Fixes
+1. **Index Error Resolved**: Addressed an issue where the index was out of bounds when predicting the tournament performance for specific players. The code now correctly retrieves the mean scores and standard deviations for all players, ensuring accurate results.
+
+## Other Changes
+1. **Code Cleanup**: Streamlined the codebase by eliminating individual score functions and instead deriving the four most likely scores for each player. This enhances code readability and improves the overall structure for future enhancements.
+2. **Data Saving**: The results of the simulation are now saved to the specified file path, enabling easy access to the derived insights and analysis.
+
+## Next Steps
+1. **Refinement and Testing**: Moving forward, we will focus on refining the code and conducting thorough testing to ensure its reliability and accuracy. This includes validating the derived scores and fine-tuning the simulation process for optimal performance.
+
+Stay tuned for more exciting developments in our golfing adventure as we continue our quest for predictive mastery!
+
+Yours in code and golf,
+The Golf Code Team

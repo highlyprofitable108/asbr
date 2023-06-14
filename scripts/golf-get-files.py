@@ -1,6 +1,7 @@
 import os
 import requests
 from pathlib import Path
+from datetime import datetime
 
 script_dir = Path(__file__).resolve().parent
 root_dir = script_dir.parent
@@ -8,7 +9,7 @@ root_dir = script_dir.parent
 constants = {
     'api_key': '195c3cb68dd9f46d7feaafc4829c',
     'base_url': "https://feeds.datagolf.com",
-    'file_path': root_dir / 'data/raw_data/golf/csv',  # absolute path
+    'file_path': Path('/Users/michaelfuscoletti/Desktop/asbr/data/golf/csv/'),
     'tours': ['pga'],
     'years': list(range(2017, 2023)),
     'file_format': 'csv',
@@ -23,7 +24,8 @@ def get_round_scoring_stats_strokes_gained():
             response = requests.get(endpoint)
             if response.status_code == 200:
                 data = response.content
-                file_path = constants['file_path'] / f'round_scoring_stats_strokes_gained_{tour}_{year}.csv'
+                timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                file_path = constants['file_path'] / f'round_scoring_stats_strokes_gained_{tour}_{year}_{timestamp}.csv'
                 if not file_path.exists() or os.path.getsize(file_path) != len(data):
                     with open(file_path, 'wb') as f:
                         f.write(data)
@@ -33,7 +35,8 @@ def get_historical_raw_data_event_ids():
     response = requests.get(endpoint)
     if response.status_code == 200:
         data = response.content
-        file_path = constants['file_path'] / 'historical_raw_data_event_ids.csv'
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_path = constants['file_path'] / f'historical_raw_data_event_ids_{timestamp}.csv'
         if not file_path.exists() or os.path.getsize(file_path) != len(data):
             with open(file_path, 'wb') as f:
                 f.write(data)
