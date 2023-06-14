@@ -232,6 +232,7 @@ Catch ya on the flip side, or not, I could just live in this basement forever.
 
 - Finally, we rounded off with some Pi monitoring. Discussed Glances - a handy tool to check if our dear Pi is panting or chuckling at our computational demands.
 
+<<<<<<< HEAD
 And that's all folks! I'm off to get some grub and rest these tired eyes. It's been a real python of a day!
 
 # Changelog - Modeling Code
@@ -308,3 +309,6 @@ Stay tuned for more exciting developments in our golfing adventure as we continu
 
 Yours in code and golf,
 The Golf Code Team
+=======
+And that's all folks! I'm off to get some grub and rest these tired eyes. It's been a real python of a day!
+>>>>>>> 52098f7 (document today. modeling executing)
