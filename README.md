@@ -1,13 +1,87 @@
-# Advanced Sports Bet Recommender (ASBR)
+# Golf Tournament Analysis and Simulation
 
-Welcome to the wild world of Advanced Sports Bet Recommender (ASBR)! If you're ready to spice up your sports betting game with a touch of mystique and a hint of herbal delight, you're in the right place.
+This project aims to analyze golf tournament data, build predictive models, and simulate tournament outcomes based on historical data. It provides tools for data handling, modeling, and simulation to gain insights into player performance and predict tournament results.
 
-ASBR is your go-to tool for taking your sports analytics to new heights. We've concocted a secret blend of algorithms, data science wizardry, and a sprinkle of herbal magic to bring you the most tantalizing bet recommendations you've ever encountered. It's like stumbling upon a hidden treasure chest of insider knowledge, but with a twist.
+## Features
 
-With ASBR, we'll unravel the enigmatic patterns, decode the hidden signals, and present you with betting insights that will make your head spin (in a good way, of course). It's like having a personal guru who whispers secrets of success into your ear, while passing around a certain "herbal supplement" to enhance the experience.
+- Data loading and preprocessing
+- Exploratory data analysis
+- Model training and evaluation
+- Simulation of tournament outcomes
+- Database operations for data storage and retrieval
+- API integration for field updates
+- Output generation and saving
 
-But wait, there's more! ASBR is not just about numbers and predictions. It's about embracing the unknown, defying the odds, and exploring the uncharted territories of sports betting. It's like embarking on a thrilling adventure through a foggy maze of possibilities, where every bet becomes an exhilarating journey of its own.
+## Requirements
 
-So, are you ready to light up your sports betting world with ASBR? Buckle up, grab your favorite snacks (preferably something crunchy), and get ready to uncover the mysteries of winning bets. Let ASBR be your trusty sidekick as you navigate the ever-shifting tides of sports analytics, with a mischievous grin and a puff of smoke trailing behind you.
+- Python 3.x
+- Required packages: pandas, numpy, matplotlib, seaborn, scikit-learn, joblib, sqlite3
 
-**Disclaimer: ASBR encourages responsible betting practices and adherence to all applicable laws and regulations. We do not promote or endorse any illegal activities or substance use. Remember to bet responsibly, within legal boundaries, and enjoy the thrill of sports betting responsibly. And if you happen to stumble upon some peculiar stories or legendary experiences from a certain herb-infused night, well... let's just say, sometimes the best tales are whispered in hazy circles.**
+## Setup
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/your-username/golf-tournament-analysis.git
+cd golf-tournament-analysis
+```
+
+2. Install the required packages using pip:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Configure the project settings:
+
+   - Open the `constants.py` file and set the appropriate values for the constants, such as database paths, API keys, output directories, etc.
+
+4. Prepare the data:
+
+   - Ensure the necessary data is available in the SQLite database.
+   - If required, populate the database tables with historical data using the provided database operations functions.
+
+5. Train the model:
+
+   - Run the `train_model.py` script to train the regression model based on the available data. The script will save the trained model in the specified model directory.
+
+6. Run simulations:
+
+   - Execute the `simulate_tournament.py` script to simulate tournament outcomes. The script will load the most recent trained regression model, fetch field updates from the API, perform data preprocessing, run simulations, and save the consolidated results in the specified output directory.
+
+## Usage
+
+- Data analysis and model training:
+
+  - Use the provided functions in `data_analysis.py` and `model_training.py` to explore the data, perform analysis, and train models.
+
+- Simulation:
+
+  - The `simulate_tournament.py` script is the main entry point for running simulations. Adjust the simulation parameters in `constants.py` as needed.
+
+- Database operations:
+
+  - Use the provided functions in `database_operations.py` to interact with the SQLite database, such as fetching round scoring data, populating player and course statistics, and backing up the database.
+
+- API integration:
+
+  - The `utils/api_utils.py` module contains functions to make API calls and retrieve field updates for the tournaments.
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvement, please submit an issue or create a pull request.
+
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT). See the `LICENSE` file for more details.
+
+## Acknowledgments
+
+- The project is inspired by the analysis and prediction of golf tournament outcomes.
+- Special thanks to the contributors and maintainers of the libraries and frameworks used in this project.
+
+## Contact
+
+For any questions or inquiries, please contact [your-email@example.com](mailto:your-email@example.com).
+
+Feel free to customize the README.md file according to your project's specific details and requirements.
