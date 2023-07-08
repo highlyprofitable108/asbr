@@ -1,8 +1,11 @@
+import warnings
+import numpy as np
+from numba import jit
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split, KFold
 from sklearn.metrics import mean_absolute_error, accuracy_score
 from imblearn.under_sampling import RandomUnderSampler
-from joblib import dump
+from joblib import Parallel, delayed
 
 
 def split_data(df, feature_columns, target_column, task_type, max_class_count=None):
@@ -42,7 +45,7 @@ def split_data(df, feature_columns, target_column, task_type, max_class_count=No
         print(y.describe())
 
         # Split the dataset into a training set and a test set
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.35, random_state=108)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=108)
 
     else:
         raise ValueError(f"Invalid task_type: {task_type}. Expected 'classification' or 'regression'.")
@@ -80,31 +83,26 @@ def balance_data(X, y, max_class_count=None):
     return X_res, y_res
 
 
-def monte_carlo_simulation(model, X, n):
-    """
-    Performs one Monte Carlo simulation.
-
-    Parameters:
-    model (estimator): The model.
-    X (array-like): The feature matrix.
-    n (int): The number of iterations.
-
-    Returns:
-    list: The predictions.
-    """
-
+def monte_carlo_simulation(model, X, n, kf_splits):
+    # Perform one Monte Carlo simulation
     monte_carlo_predictions = []
 
+    kf = KFold(n_splits=kf_splits, shuffle=True)
+
     for _ in range(n):
-        sample_indices = np.random.choice(len(X), size=len(X), replace=True)
-        X_sample = X[sample_indices]
-        y_sample_pred = model.predict(X_sample)
-        monte_carlo_predictions.append(y_sample_pred)
+        fold_predictions = []
+
+        for _, test_indices in kf.split(X):
+            X_test_fold = X[test_indices]
+            y_sample_pred = model.predict(X_test_fold)
+            fold_predictions.append(y_sample_pred)
+
+        monte_carlo_predictions.append(np.concatenate(fold_predictions))
 
     return monte_carlo_predictions
 
 
-def train_and_evaluate_model(estimator, param_grid, X_train, X_test, y_train, y_test, problem_type, num_samples_range=[1, 10, 50], cv=10):
+def train_and_evaluate_model(estimator, param_grid, X_train, X_test, y_train, y_test, problem_type, num_samples_range=[100], cv=5):
     """
     Train and evaluate a model using GridSearchCV and perform Monte Carlo simulations.
 
@@ -122,7 +120,7 @@ def train_and_evaluate_model(estimator, param_grid, X_train, X_test, y_train, y_
     Returns:
     tuple: The best model, the best metric score, and the scaler.
     """
-    
+
     print("Scaling the data...")
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
@@ -147,19 +145,15 @@ def train_and_evaluate_model(estimator, param_grid, X_train, X_test, y_train, y_
         print(f"Performing Monte Carlo simulations with {num_samples} iterations...")
         monte_carlo_predictions = []
 
-        print("Simulating... It may take a while, so you can take a break or go to bed.")
+        def simulate_iteration(i):
+            # Perform the simulation
+            predictions = monte_carlo_simulation(CV_rfc.best_estimator_, X_test_scaled, num_samples, cv)
+            return predictions
 
-        for i in range(num_samples):
-            kf = KFold(n_splits=cv, shuffle=True, random_state=i)
-
-            for _, _ in kf.split(X_train_scaled):
-                # Perform the simulation
-                predictions = monte_carlo_simulation(CV_rfc.best_estimator_, X_test_scaled, num_samples)
-                monte_carlo_predictions.append(predictions)
-
-            print(f"Simulation iteration: {i+1}/{num_samples}")
-
-        print("Simulation completed. Good morning!")
+        monte_carlo_predictions = Parallel(n_jobs=2, verbose=2)(
+            delayed(
+                simulate_iteration)(i) for i in range(num_samples)
+        )
 
         monte_carlo_predictions = np.concatenate(monte_carlo_predictions, axis=0)
 

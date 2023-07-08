@@ -1,7 +1,9 @@
 import sqlite3
 import gzip
 import os
+import csv
 import shutil
+from io import StringIO
 from datetime import datetime
 from constants import constants
 from utils.api_utils import make_api_call, get_location_data, get_weather_data
@@ -220,6 +222,7 @@ def populate_course_data(db_conn: sqlite3.Connection) -> None:
         db_conn.commit()
 
         # Fetch courses whose location data hasn't been retrieved yet
+        """
         cursor.execute("SELECT DISTINCT course_name FROM courses WHERE location_fetched = 0")
         courses = cursor.fetchall()
 
@@ -229,13 +232,14 @@ def populate_course_data(db_conn: sqlite3.Connection) -> None:
 
             if lat is not None and lon is not None:
                 # Update course location data in the courses table
-                cursor.execute("""
+                cursor.execute(
                     UPDATE courses
                     SET latitude = ?, longitude = ?, location_fetched = 1
                     WHERE course_name = ?
-                """, (lat, lon, course_name))
+                , (lat, lon, course_name))
                 db_conn.commit()
-                
+        """
+
     except sqlite3.Error as e:
         print(f"Error occurred during course data processing: {e}")
 
@@ -255,7 +259,19 @@ def populate_weather_table(db_conn: sqlite3.Connection) -> None:
         unique_date_course_combinations = cursor.fetchall()
 
         for date_course in unique_date_course_combinations:
-            date = datetime.strptime(date_course[0], '%Y-%m-%d')
+            if date_course[0] is None:  # check if date string is None
+                continue  # skip this iteration if it is None
+
+            try:
+                # Check if date string is in correct format
+                date = datetime.strptime(date_course[0].split()[0], '%Y-%m-%d')
+            except ValueError:
+                print(f"Unexpected date format for {date_course[0]}")
+                continue
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+                continue
+
             course_name = date_course[1]
 
             # Fetch course location data
@@ -283,3 +299,25 @@ def populate_weather_table(db_conn: sqlite3.Connection) -> None:
                     db_conn.commit()
     except sqlite3.Error as e:
         print(f"Error occurred during weather data processing: {e}")
+
+
+def create_model_data_table(db_conn):
+    cursor = db_conn.cursor()
+
+    # Drop the model_data table if it already exists
+    cursor.execute("""
+        DROP TABLE IF EXISTS model_data
+    """)
+
+    # Create the new table by joining the rounds and weather tables
+    cursor.execute("""
+        CREATE TABLE model_data AS
+        SELECT rounds.date, weather.date, rounds.course_name, weather.course_name, rounds.course_num, rounds.sg_total, 
+                rounds.sg_putt, rounds.sg_arg, rounds.sg_app, rounds.sg_ott, 
+                rounds.driving_dist, rounds.driving_acc, rounds.gir, rounds.scrambling, rounds.prox_rgh, rounds.prox_fw, 
+                weather.minimum_temperature, weather.maximum_temperature, weather.temperature, weather.precipitation_amount, weather.wind_gust, weather.wind_speed
+        FROM rounds
+        LEFT JOIN weather ON DATE(rounds.date) = DATE(weather.date) AND rounds.course_name = weather.course_name
+    """)
+
+    db_conn.commit()
