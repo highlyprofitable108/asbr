@@ -1,5 +1,4 @@
-```mermaid
-  graph LR
+graph LR
   subgraph "Common Python Scripts"
     A1[api_utils]
     A2[model_utils]
@@ -156,35 +155,34 @@
     F3 -->|Provides feature cols| F8
     F2 -->|Provides vars & paths| F9
     F3 -->|Provides feature cols| F9
-    end
-    B4 –> A1
-    B5 –> A3
-    B6 –> A2
-    B7 –> A5
-    B8 –> A1
-    B9 –> A4
-    C4 –> A1
-    C5 –> A3
-    C6 –> A2
-    C7 –> A5
-    C8 –> A1
-    C9 –> A4
-    D4 –> A1
-    D5 –> A3
-    D6 –> A2
-    D7 –> A5
-    D8 –> A1
-    D9 –> A4
-    E4 –> A1
-    E5 –> A3
-    E6 –> A2
-    E7 –> A5
-    E8 –> A1
-    E9 –> A4
-    F4 –> A1
-    F5 –> A3
-    F6 –> A2
-    F7 –> A5
-    F8 –> A1
-    F9 –> A4
-```
+  end
+B4 --> A1
+B5 --> A3
+B6 --> A2
+B7 --> A5
+B8 --> A1
+B9 --> A4
+C4 --> A1
+C5 --> A3
+C6 --> A2
+C7 --> A5
+C8 --> A1
+C9 --> A4
+D4 --> A1
+D5 --> A3
+D6 --> A2
+D7 --> A5
+D8 --> A1
+D9 --> A4
+E4 --> A1
+E5 --> A3
+E6 --> A2
+E7 --> A5
+E8 --> A1
+E9 --> A4
+F4 --> A1
+F5 --> A3
+F6 --> A2
+F7 --> A5
+F8 --> A1
+F9 --> A4
