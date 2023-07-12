@@ -1,4 +1,5 @@
-graph LR
+```mermaid
+  graph LR
   subgraph "Common Python Scripts"
     A1[api_utils]
     A2[model_utils]
@@ -186,3 +187,4 @@ graph LR
     F7 –> A5
     F8 –> A1
     F9 –> A4
+```
