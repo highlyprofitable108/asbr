@@ -1,4 +1,4 @@
-```graph LR
+graph LR
   subgraph "Common Python Scripts"
     A1[api_utils]
     A2[model_utils]
@@ -150,11 +150,11 @@
     F2 -->|Provides vars & paths| F6
     F3 -->|Provides feature cols| F6
     F2 -->|Provides vars & paths| F7
-    F3 –>|Provides feature cols| F7
-    F2 –>|Provides vars & paths| F8
-    F3 –>|Provides feature cols| F8
-    F2 –>|Provides vars & paths| F9
-    F3 –>|Provides feature cols| F9
+    F3 -->|Provides feature cols| F7
+    F2 -->|Provides vars & paths| F8
+    F3 -->|Provides feature cols| F8
+    F2 -->|Provides vars & paths| F9
+    F3 -->|Provides feature cols| F9
     end
     B4 –> A1
     B5 –> A3
@@ -186,4 +186,3 @@
     F7 –> A5
     F8 –> A1
     F9 –> A4
-```
