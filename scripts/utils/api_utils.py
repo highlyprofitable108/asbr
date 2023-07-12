@@ -1,19 +1,16 @@
-# Import necessary libraries
 import requests
 from constants import constants
-# urllib is needed to encode URL parameters
 import urllib
-# csv and StringIO are required to handle CSV data
 import csv
 from io import StringIO
-# OpenCageGeocode is necessary for geocoding (getting lat, lon for a location)
 from opencage.geocoder import OpenCageGeocode
 
 
 def make_api_call(url):
     """
     Makes a GET request to a given URL.
-    Returns the response content if the status code is 200, otherwise raises an Exception.
+    Returns the response content if the status code is 200,
+        otherwise raises an Exception.
 
     Args:
         url (str): The URL to which the GET request will be sent.
@@ -28,7 +25,9 @@ def make_api_call(url):
     if response.status_code == 200:
         return response.content
     else:
-        raise Exception(f'GET request failed with status {response.status_code}')
+        raise Exception(
+            f'GET request failed with status {response.status_code}'
+        )
 
 
 def get_location_data(course_name):
@@ -71,7 +70,7 @@ def get_elevation_data(lat, lon):
         "output": "json",
         "x": lon,
         "y": lat,
-        "units": "Meters"  
+        "units": "Meters"
     })
     url = f"https://nationalmap.gov/epqs/pqs.php?{query}"
 
@@ -101,7 +100,11 @@ def get_weather_data(date, lat, lon):
     date_str = date.strftime('%Y-%m-%d')
 
     # Create the API request URL
-    url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{lat}%2C{lon}/{date_str}/{date_str}?unitGroup=us&include=days&key={weather_key}&contentType=csv"
+    url = (
+        f"https://weather.visualcrossing.com/VisualCrossingWebServices/"
+        f"rest/services/timeline/{lat}%2C{lon}/{date_str}/{date_str}?"
+        f"unitGroup=us&include=days&key={weather_key}&contentType=csv"
+    )
 
     # Make a GET request to the API
     response = make_api_call(url)

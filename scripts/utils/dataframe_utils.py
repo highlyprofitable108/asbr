@@ -17,16 +17,20 @@ def read_and_concatenate(directory: Path, file_list: List[str]):
         pd.DataFrame: Concatenated dataframe.
     """
     df = pd.DataFrame()
+
+    # Format path and read file
+    #   at location
     for file in file_list:
-        filepath = directory / file  # combine directory path with the file name
-        df_temp = pd.read_csv(filepath)  # read the CSV file into a dataframe
-        df = pd.concat([df, df_temp])  # concatenate the dataframes
+        filepath = directory / file
+        df_temp = pd.read_csv(filepath)
+        df = pd.concat([df, df_temp])
     return df
 
 
 def handle_missing_values(df: pd.DataFrame):
     """
-    Handle missing values in a dataframe. For numeric columns, rows with missing values are dropped.
+    Handle missing values in a dataframe. For numeric columns,
+        rows with missing values are dropped.
     For categorical columns, missing values are replaced with 'Unknown'.
 
     Args:
@@ -73,16 +77,19 @@ def convert_to_datetime(df: pd.DataFrame, columns: List[str]):
         columns (List[str]): Columns to convert to datetime format.
 
     Returns:
-        pd.DataFrame: Dataframe with specified columns converted to datetime format.
+        pd.DataFrame:
+            Dataframe with specified columns converted to datetime format.
     """
+    # Convert the column to datetime format
     for column in columns:
-        df[column] = pd.to_datetime(df[column])  # convert the column to datetime format
+        df[column] = pd.to_datetime(df[column])
     return df
 
 
 def perform_knn_imputation(df: pd.DataFrame):
     """
-    Perform K-Nearest Neighbors (KNN) imputation on a dataframe. The imputation is performed only on columns with numeric values.
+    Perform K-Nearest Neighbors (KNN) imputation on a dataframe.
+    The imputation is performed only on columns with numeric values.
 
     Args:
         df (pd.DataFrame): Input dataframe.
@@ -105,7 +112,7 @@ def perform_knn_imputation(df: pd.DataFrame):
 
     # Impute missing values using KNN imputation
     for column in columns_to_impute:
-        imputer = KNNImputer(n_neighbors=5, weights='uniform')  # initialize KNN imputer
-        df_imputed[column] = imputer.fit_transform(df_imputed[[column]])  # impute the missing values
+        imputer = KNNImputer(n_neighbors=5, weights='uniform')
+        df_imputed[column] = imputer.fit_transform(df_imputed[[column]])
 
     return df_imputed

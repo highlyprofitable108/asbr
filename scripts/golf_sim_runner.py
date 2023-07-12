@@ -1,16 +1,17 @@
-import sqlite3
-import pandas as pd
-import numpy as np
-import os
 import io
+import os
+import time
+import sqlite3
 import datetime
-from joblib import load
+import cProfile
+import numpy as np
+import pandas as pd
 from pathlib import Path
+from joblib import load
 from constants import constants
 from features import features
 from utils.api_utils import make_api_call
-from utils.file_utils import write_to_file, get_most_recent_file
-from concurrent.futures import ProcessPoolExecutor
+from utils.file_utils import get_most_recent_file
 
 
 class SimRunner:
@@ -22,139 +23,256 @@ class SimRunner:
         self.file_format = 'csv'
         self.key = constants['api_key']
         self.num_iterations = constants['num_iterations']
+        self.database_path = constants['database_path']
 
-    def fetch_data_from_sqlite(self):
-        print("Fetching player data from SQLite database...")
-        conn = sqlite3.connect(constants['database_path'])
-        player_data = pd.read_sql_query('SELECT * FROM player_performance', conn)
-        conn.close()
-        print("Player data fetched.")
-        return player_data
-    
+    def get_players_filtered_by_dg_ids(self, dg_ids):
+        conn = sqlite3.connect(self.database_path)
+
+        # Create a string with a placeholder for each ID in dg_ids
+        placeholders = ', '.join('?' for _ in dg_ids)
+
+        # Insert the placeholders in the SQL query
+        sql_query = f"""
+        SELECT *
+        FROM players
+        WHERE dg_id IN ({placeholders})
+        """
+
+        # Execute query and fetch DataFrame
+        players_df = pd.read_sql_query(sql_query, conn, params=dg_ids)
+
+        return players_df
+
     def get_field_updates(self) -> list:
         print("Fetching field updates from API...")
-        url = f"{self.url}/field-updates?tour={self.tour}&file_format={self.file_format}&key={self.key}"
+        url = f"{self.url}/field-updates?tour={self.tour}" \
+              f"&file_format={self.file_format}&key={self.key}"
         response_content = make_api_call(url)
-        content = response_content.decode('utf-8')  # Convert the bytes to a string
+        content = response_content.decode('utf-8')
         df_updates = pd.read_csv(io.StringIO(content))
+
         dg_ids = df_updates['dg_id'].tolist()
+
+        # Get the players DataFrame from SQLite
+        players_df = self.get_players_filtered_by_dg_ids(dg_ids)
         print("Field updates fetched.")
-        return dg_ids
-    
 
-    def predict_tournament(self, model, player_dg_ids, player_data, num_rounds=4):
-        print("Predicting scores for the tournament players...")
-        upcoming_event_features = player_data[player_data['dg_id'].isin(player_dg_ids)]
+        return players_df
 
-        # Create an empty DataFrame to store the results
-        results = pd.DataFrame(columns=['player_name', 'round', 'score'])
+    def get_player_scores(self, dg_id, years=3):
+        conn = sqlite3.connect(self.database_path)
 
-        for index, row in upcoming_event_features.iterrows():
-            for round in range(num_rounds):
-                # Extract the features from the player's data
-                player_features = row[features]
+        # Calculate the date from three years ago
+        three_years_ago = datetime.datetime.now() - datetime.timedelta(
+            days=years*365
+        )
+        three_years_ago_str = three_years_ago.strftime('%Y-%m-%d')
 
-                # Predict the score using the trained regression model
-                predicted_scores = model.predict([player_features])[0]
-                print(predicted_scores)
-                # Create a DataFrame with the predicted scores
-                scores_df = pd.DataFrame({'player_name': row['player_name'], 'round': round + 1, 'score': predicted_scores}, index=[0])
+        # SQL query to fetch all the round scores for
+        # the player over the last 3 years
+        sql_query = """
+            SELECT sg_total
+            FROM rounds
+            WHERE dg_id = ? AND date >= ?
+            ORDER BY date DESC
+        """
 
-                # Concatenate the scores DataFrame with the results DataFrame
-                results = pd.concat([results, scores_df], ignore_index=True)
+        player_scores_df = pd.read_sql_query(
+            sql_query, conn, params=(dg_id, three_years_ago_str)
+        )
 
-        print("Scores predicted for the tournament players.")
-        return results
+        # If the player has less than 10 rounds,
+        #   provide the mean sg_total of all rounds played by any player
+        if len(player_scores_df) < 10:
+            sql_query_all_players = """
+            SELECT AVG(sg_total) as avg_sg_total
+            FROM rounds
+            WHERE date >= ? AND sg_total BETWEEN -10 AND 10
+            """
+            avg_sg_total_df = pd.read_sql_query(
+                sql_query_all_players, conn, params=(three_years_ago_str,)
+            )
+            player_scores_df = pd.DataFrame(
+                {'sg_total': [avg_sg_total_df['avg_sg_total'].values[0]] * 10}
+            )
 
-    def simulate_tournament(self, model, player_data, num_rounds):
-        print("Simulating a tournament...")
-        # Get the player IDs in the current field
+        return player_scores_df['sg_total']
+
+    def preload_player_stats(self, dg_ids, years=3):
+        # Fetch all the necessary player scores and calculate
+        # the mean and standard deviation before starting simulations]
+        print("Calculating player stats...")
+
+        player_stats_data = {}
+        for dg_id in dg_ids:
+            player_scores = self.get_player_scores(dg_id, years)
+            player_scores = pd.to_numeric(player_scores, errors='coerce')
+            player_scores = player_scores.dropna()
+            player_stats_data[dg_id] = {
+                'mean_score': np.mean(player_scores.values),
+                'std_dev': np.std(player_scores.values)
+            }
+
+        print("Player stats calculated.")
+        return player_stats_data
+
+    # New method to preload player predicted scores
+    def preload_player_predicted_scores(self, model, player_data, features):
+        print("Calculating player predicted scores...")
+
+        player_predicted_scores = {}
+        for _, player_row in player_data.iterrows():
+            dg_id = player_row['dg_id']
+            player_features = player_row[features].tolist()
+            predicted_score = model.predict([player_features])[0]
+            player_predicted_scores[dg_id] = predicted_score
+
+        print("Player predicted scores calculated.")
+        return player_predicted_scores
+
+    # Updated method to use preloaded player predicted scores
+    def simulate_tournament(
+        self,
+        model,
+        player_data,
+        num_rounds,
+        sim_num,
+        player_stats_data,  # use preloaded player stats data
+        player_predicted_scores,  # use preloaded player predicted scores
+        features=None
+    ):
         dg_ids = player_data['dg_id'].tolist()
+        tournament_results = []
 
-        # Predict scores for all players in the tournament using the model
-        results = self.predict_tournament(model, dg_ids, player_data, num_rounds)
+        for sim, dg_id in enumerate(dg_ids, start=1):
+            player_row = player_data[player_data['dg_id'] == dg_id].iloc[0]
+            player_name = player_row['player_name']
 
-        print("Tournament simulated.")
-        return results
+            # Use the pre-calculated mean score and standard deviation
+            mean_score = player_stats_data[dg_id]['mean_score']
+            std_dev = player_stats_data[dg_id]['std_dev']
 
+            # Use the pre-calculated predicted score
+            predicted_score = player_predicted_scores[dg_id]
 
-    def simulate_multiple_tournaments(self, model, player_data, num_tournaments=1000, num_rounds=4):
-        print("Simulating multiple tournaments...")
+            round_scores = []
+            total_score = 0
+            for round_num in range(1, num_rounds + 1):
+                # Generate a random score based on the mean
+                #   and standard deviation
+                random_score = np.random.normal(mean_score, std_dev)-mean_score
+                predicted_score = int(predicted_score)
+                generated_score = predicted_score-random_score
+                round_scores.append(generated_score)
+                total_score += generated_score
+
+            tournament_results.append({
+                'sim': sim_num,
+                'dg_id': dg_id,
+                'player_name': player_name,
+                'total_score': total_score,
+                **{f'round{i}': score for i, score in enumerate(
+                    round_scores, start=1
+                )}
+            })
+
+        return pd.DataFrame(tournament_results)
+
+    def simulate_multiple_tournaments(
+        self,
+        model,
+        player_data,
+        player_stats_data,
+        player_predicted_scores,  # use preloaded player predicted scores
+        num_tournaments=10,
+        num_rounds=4,
+        features=None
+    ):
+        print(f"Simulating {num_tournaments} tournaments...")
         tournament_results = pd.DataFrame()
 
-        with ProcessPoolExecutor() as executor:
-            futures = []
-            for tournament in range(num_tournaments):
-                future = executor.submit(self.simulate_tournament, model, player_data, num_rounds)
-                futures.append(future)
+        start_time = time.time()
 
-            for tournament, future in enumerate(futures, start=1):
-                results = future.result()
+        for tournament in range(num_tournaments):
+            try:
+                results = self.simulate_tournament(
+                    model=model,
+                    player_data=player_data,
+                    num_rounds=num_rounds,
+                    sim_num=tournament,
+                    player_stats_data=player_stats_data,
+                    player_predicted_scores=player_predicted_scores,
+                    features=features
+                )
 
-                # Calculate the total score for each player in the tournament
-                total_scores = results.groupby('player_name')['score'].sum()
-
-                # Find the winner of the tournament (the player with the lowest total score)
-                winner = total_scores.idxmin()
-
-                # Add the winner to the tournament_results DataFrame
-                tournament_results = tournament_results.append({'tournament': tournament, 'winner': winner}, ignore_index=True)
-                print(f"Simulated tournament {tournament}...")
+                tournament_results = pd.concat(
+                    [tournament_results, results], ignore_index=True
+                )
+                if tournament % 1000 == 0:
+                    end_time = time.time()
+                    elapsed_time = end_time - start_time
+                    print(
+                        f"Simmed tournaments {tournament}-{tournament+1000}. "
+                        f"Elapsed time: {elapsed_time:.2f} seconds"
+                    )
+                    start_time = time.time()
+            except Exception as e:
+                print(f"Error in simulating tournament {tournament+1}: {e}")
 
         print("Multiple tournaments simulated.")
         return tournament_results
-    
-
-    def calculate_first_round_leader(self, player_data):
-        print("Calculating first round leader statistics...")
-        first_round_leader = player_data.groupby(['dg_id', 'player_name']).agg({'first_round_score': ['mean', 'std', 'count']}).reset_index()
-        first_round_leader.columns = ['dg_id', 'player_name', 'first_round_score_average', 'first_round_deviation', 'count_of_times_dg_id_low_first_round']
-        first_round_leader['american_odds_to_lead'] = first_round_leader['count_of_times_dg_id_low_first_round'].apply(lambda x: '+{:d}'.format(int((1 / x - 1) * 100)) if x > 0 else 0)
-        print("First round leader statistics calculated.")
-        return first_round_leader
 
     def get_most_recent_model(self):
         print("Fetching the most recent model...")
-        model_filepath = get_most_recent_file(self.model_directory, 'rf_regression*.joblib')
+        model_filepath = get_most_recent_file(
+            self.model_directory, 'random_forest*.joblib')
         model = load(model_filepath)
         print("Model fetched.")
         return model
 
-    def create_temp_table_and_append_player_stats(self, dg_ids, db_path):
-        print("Creating player performance DataFrame...")
-        conn = sqlite3.connect(db_path)
-        query = f"SELECT * FROM player_performance WHERE dg_id IN ({','.join(['?']*len(dg_ids))})"
-        player_data = pd.read_sql_query(query, conn, params=dg_ids)
-        conn.close()
-        print("Player performance DataFrame created.")
-        return player_data
-
     def run(self):
+        profiler = cProfile.Profile()
+        profiler.enable()
+
         print("Starting the simulation...")
         print("---------------------------")
-        player_data = self.fetch_data_from_sqlite()
+        player_data = self.get_field_updates()
         print("---------------------------")
-        field_player_ids = self.get_field_updates()
-        print("---------------------------")
-        player_data = self.create_temp_table_and_append_player_stats(field_player_ids, constants['database_path'])
+
+        # Preload player stats data
+        dg_ids = player_data['dg_id'].tolist()
+        player_stats_data = self.preload_player_stats(dg_ids)
         print("---------------------------")
         self.model = self.get_most_recent_model()
         print("---------------------------")
-        tournament_results = self.simulate_multiple_tournaments(self.model, player_data, self.num_iterations)
+        player_predicted_scores = self.preload_player_predicted_scores(
+            self.model, player_data, features
+        )
         print("---------------------------")
-        first_round_leader = self.calculate_first_round_leader(tournament_results)
+        tournament_results = self.simulate_multiple_tournaments(
+            model=self.model,
+            player_data=player_data,
+            player_stats_data=player_stats_data,
+            player_predicted_scores=player_predicted_scores,
+            num_tournaments=self.num_iterations,
+            num_rounds=4,
+            features=features
+        )
         print("---------------------------")
-        print("Saving tournament results and first round leader statistics...")
+        print("Saving tournament results and statistics...")
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        tournament_results_file_name = f"golf-sim-tournament-results-{timestamp}.csv"
-        first_round_leader_file_name = f"golf-sim-first-round-leader-{timestamp}.csv"
-        tournament_results_file_path = Path(os.path.join(self.output_directory, tournament_results_file_name))
-        first_round_leader_file_path = Path(os.path.join(self.output_directory, first_round_leader_file_name))
-        tournament_results_data = tournament_results.to_csv(index=False).encode()
-        write_to_file(tournament_results_file_path, tournament_results_data)
-        first_round_leader_data = first_round_leader.to_csv(index=False).encode()
-        write_to_file(first_round_leader_file_path, first_round_leader_data)
+        tournament_results_file_name = (
+            f"golf-sim-tournament-results-{timestamp}.csv"
+        )
+        tournament_results_file_path = Path(
+            os.path.join(self.output_directory, tournament_results_file_name)
+        )
+        tournament_results.to_csv(tournament_results_file_path, index=False)
         print("Simulation completed.")
+
+        profiler.disable()
+        # profiler.print_stats(sort='time')
+
 
 if __name__ == "__main__":
     output_directory = constants['output_directory']

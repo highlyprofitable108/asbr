@@ -7,58 +7,75 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.linear_model import LinearRegression
+from sklearn.base import BaseEstimator, RegressorMixin
+import statsmodels.api as sm
 from constants import constants
 from features import features
-from utils.file_utils import save_model
-from utils.model_utils import train_and_evaluate_model, split_data
+from utils.model_utils import train_and_evaluate_model, split_data, save_model
 from utils.dataframe_utils import handle_missing_values, perform_knn_imputation
 
 logging.basicConfig(
     filename=f"{constants['model_path']}/model.log", level=logging.INFO
 )
 
+
+class SMWrapper(BaseEstimator, RegressorMixin):
+    """ A universal sklearn-style wrapper for statsmodels regressors """
+    def __init__(self, model_class, fit_intercept=True):
+        self.model_class = model_class
+        self.fit_intercept = fit_intercept
+
+    def fit(self, X, y):
+        if self.fit_intercept:
+            X = sm.add_constant(X)
+        self.model_ = self.model_class(y, X)
+        self.results_ = self.model_.fit()
+        self.coef_ = (
+            self.results_.params if hasattr(self.results_, 'params') else None
+        )
+
+    def predict(self, X):
+        if self.fit_intercept:
+            X = sm.add_constant(X)
+        return self.results_.predict(X)
+
+
 # Define parameter grids for different models
-param_grid_gb = {
-    'n_estimators': [1000, 5000],
-    'learning_rate': [0.1],
-    'max_depth': [1],
-    'min_samples_split': [2],
-    'min_samples_leaf': [2]
-}
-
-param_grid_dt = {
-    'criterion': ['squared_error'],
-    'splitter': ['best'],
-    'max_depth': [None],
-    'min_samples_split': [5],
-    'min_samples_leaf': [2]
-}
-
 param_grid_lr = {
     'fit_intercept': [True],
     'n_jobs': [-1],
     'positive': [False]
 }
 
-
-param_grid_mlp = {
-    'hidden_layer_sizes': [(50,), (100,), (50, 50)],
-    'activation': ['relu', 'tanh', 'logistic'],
-    'solver': ['adam', 'sgd'],
-    'alpha': [0.0001, 0.001, 0.01],
-    'learning_rate': ['constant', 'invscaling', 'adaptive'],
+param_grid_gb = {
+    'n_estimators': [5000],
+    'learning_rate': [0.5],
+    'max_depth': [3],
+    'min_samples_split': [100],
+    'min_samples_leaf': [2]
 }
 
 param_grid_rf = {
-    'n_estimators': [10, 50, 100],
-    'max_depth': [None, 5, 10],
-    'min_samples_split': [2, 5],
-    'min_samples_leaf': [1, 2]
+    'n_estimators': [1000],
+    'max_depth': [None],
+    'min_samples_split': [2],
+    'min_samples_leaf': [1]
 }
 
-param_grid_ols = {
-    'fit_intercept': [True, False],
-    'normalize': [True, False],
+param_grid_dt = {
+    'criterion': ['friedman_mse'],
+    'splitter': ['random'],
+    'max_depth': [None],
+    'min_samples_split': [10, 50, 100],
+    'min_samples_leaf': [4, 16, 64]
+}
+
+param_grid_mlp = {
+    'hidden_layer_sizes': [(200, 200)],
+    'activation': ['relu'],
+    'solver': ['adam'],
+    'alpha': [0.01],
+    'learning_rate': ['constant'],
 }
 
 
@@ -70,7 +87,8 @@ def main():
     conditions = [f"{col} >= -1000 AND {col} <= 1000" for col in features]
     where_clause = " AND ".join(conditions)
     where_clause += " AND " + " AND ".join(
-        [f"{col} IS NOT NULL" for col in features])
+        [f"{col} IS NOT NULL" for col in features]
+    )
 
     print("Executing SQL query...")
     cursor.execute(f"""
@@ -97,24 +115,43 @@ def main():
         )
 
         models = [
-            ("Gradient Boosting",
-             GradientBoostingRegressor(random_state=0), param_grid_gb),
-            ("Decision Tree",
-             DecisionTreeRegressor(random_state=0), param_grid_dt),
-            ("Linear Regression",
-             LinearRegression(), param_grid_lr),
-            ("Neural Network",
-             MLPRegressor(max_iter=500, random_state=0), param_grid_mlp),
-            ("Random Forest",
-             RandomForestRegressor(random_state=0), param_grid_rf),
-            ("Ordinary Least Squares",
-             LinearRegression(), param_grid_ols)
+            (
+                "neural_network",
+                MLPRegressor(max_iter=500, random_state=108),
+                param_grid_mlp
+            ),
+            (
+                "ordinary_least_squares",
+                SMWrapper(sm.OLS),
+                {}
+            ),
+            (
+                "linear_regression",
+                LinearRegression(),
+                param_grid_lr
+            ),
+            (
+                "random_forest",
+                RandomForestRegressor(random_state=108),
+                param_grid_rf
+            ),
+            (
+                "decision_tree",
+                DecisionTreeRegressor(random_state=108),
+                param_grid_dt
+            ),
+            (
+                "gradient_boosting",
+                GradientBoostingRegressor(random_state=108),
+                param_grid_gb
+            ),
         ]
 
-        for model_name, model, param_grid in tqdm(models,
-                                                  desc='Training models',
-                                                  unit='model'
-                                                  ):
+        for model_name, model, param_grid in tqdm(
+            models,
+            desc='Training models',
+            unit='model'
+        ):
             print(f"\nTraining and evaluating {model_name} model...")
             trained_model, error, _ = train_and_evaluate_model(
                 model,
@@ -126,14 +163,6 @@ def main():
                 'regression'
             )
 
-            print(f"Saving {model_name} model...")
-            model_name_formatted = model_name.replace(' ', '_').lower()
-            date_str = date.today().strftime()
-            model_filename = f"{model_name_formatted}_{date_str}"
-            save_model(trained_model,
-                       constants['model_path'],
-                       model_filename, column_names[:-1])
-
             print(f"Preparing performance data for {model_name} model...")
             performance_data = {
                 'X_test': X_test,
@@ -144,41 +173,41 @@ def main():
             # Log model performance
             logging.info(f"{model_name} error: {error}")
 
-            # Log feature importances for tree-based models
+            # Initialize feature_importances as None
+            feature_importances = None
+
+            # Log feature importances for linear models
             if isinstance(trained_model, LinearRegression):
                 feature_importances = dict(
-                    zip(
-                        column_names[:-1], trained_model.coef_
-                        )
-                    )
-            else:
+                    zip(column_names[:-1], trained_model.coef_)
+                )
+
+            # Log feature importances for tree-based models
+            elif hasattr(trained_model, 'feature_importances_'):
                 feature_importances = dict(
-                    zip(
-                        column_names[:-1], trained_model.feature_importances_
-                        )
-                    )
+                    zip(column_names[:-1], trained_model.feature_importances_)
+                )
 
             logging.info(
                 f"{model_name} feature importances: {feature_importances}"
-                )
-
-            if model_name == "Neural Network" and not trained_model.converged_:
-                logging.warning(
-                    f"{model_name} did not converge. "
-                    " Consider increasing the maximum number of iterations."
-                )
-
-            print(f"Saving performance data for {model_name} model...")
-            performance_filename = (
-                f"performance_data_{model_name.replace(' ', '_').lower()}"
-                f"_{date.today().strftime('%Y-%m-%d')}"
             )
 
+            if model_name == "Neural Network" and hasattr(
+                trained_model, 'converged_'
+            ) and not trained_model.converged_:
+                print(f"{model_name} did not converge. "
+                      "Consider increasing the maximum number of iterations.")
+
+            print(f"Saving for {model_name} model...")
+            model_name_formatted = model_name.replace(' ', '_').lower()
+            date_str = date.today().strftime('%Y-%m-%d')
+            model_filename = f"{model_name_formatted}_{date_str}"
             save_model(
-                performance_data,
+                trained_model,
                 constants['model_path'],
-                performance_filename,
-                column_names[:-1]
+                model_filename,
+                column_names[:-1],
+                performance_data
             )
 
     print("\nProcess completed successfully!")
