@@ -1,4 +1,4 @@
-```
+```mermaid
 graph LR
   subgraph "Common Python Scripts"
     A1[api_utils]
