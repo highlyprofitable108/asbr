@@ -35,7 +35,6 @@ graph LR
     B2 -->|Provides vars & paths| B8
     B3 -->|Provides feature cols| B8
     B2 -->|Provides vars & paths| B9
-    B3 -->|Provides feature cols| B9
   end
   subgraph "Sport: NFL"
     C1[nfl_db]
@@ -65,7 +64,6 @@ graph LR
     C2 -->|Provides vars & paths| C8
     C3 -->|Provides feature cols| C8
     C2 -->|Provides vars & paths| C9
-    C3 -->|Provides feature cols| C9
   end
   subgraph "Sport: College Football"
     D1[cfb_db]
@@ -95,7 +93,6 @@ graph LR
     D2 -->|Provides vars & paths| D8
     D3 -->|Provides feature cols| D8
     D2 -->|Provides vars & paths| D9
-    D3 -->|Provides feature cols| D9
   end
   subgraph "Sport: College Basketball"
     E1[cbb_db]
@@ -125,7 +122,6 @@ graph LR
     E2 -->|Provides vars & paths| E8
     E3 -->|Provides feature cols| E8
     E2 -->|Provides vars & paths| E9
-    E3 -->|Provides feature cols| E9
   end
   subgraph "Sport: Fantasy Football"
     F1[ff_db]
@@ -155,7 +151,6 @@ graph LR
     F2 -->|Provides vars & paths| F8
     F3 -->|Provides feature cols| F8
     F2 -->|Provides vars & paths| F9
-    F3 -->|Provides feature cols| F9
   end
 B4 --> A1
 B5 --> A3
